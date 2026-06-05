@@ -311,6 +311,7 @@ input::placeholder{color:rgba(77,255,110,.28);font-size:11px;letter-spacing:2px;
       <option value="passivo">PASSIVO</option>
     </select>
     <button class="filter-btn" id="btn-poi" onclick="togglePOIs()">⊕ PONTOS DE CONCENTRAÇÃO</button>
+    <button class="filter-btn" id="btn-ibge" onclick="toggleIBGE()" style="border-color:rgba(196,160,64,.4);color:rgba(196,160,64,.7);">⊕ DOMICÍLIOS IBGE</button>
     <button class="filter-btn" onclick="exportarCSV()" style="border-color:rgba(196,160,64,.4);color:rgba(196,160,64,.8);">⬇ EXPORTAR CSV</button>
     <div class="live-dot"><div class="dot"></div>TEMPO REAL</div>
   </div>
@@ -331,6 +332,17 @@ input::placeholder{color:rgba(77,255,110,.28);font-size:11px;letter-spacing:2px;
       <div style="display:flex;align-items:center;gap:6px;"><div style="width:9px;height:9px;border-radius:50%;background:#fff176;flex-shrink:0;"></div><span style="font-size:8px;opacity:.6;letter-spacing:.5px;">Escola</span></div>
       <div style="display:flex;align-items:center;gap:6px;"><div style="width:9px;height:9px;border-radius:50%;background:#ce93d8;flex-shrink:0;"></div><span style="font-size:8px;opacity:.6;letter-spacing:.5px;">Igreja</span></div>
       <div style="display:flex;align-items:center;gap:6px;"><div style="width:9px;height:9px;border-radius:50%;background:#ffcc80;flex-shrink:0;"></div><span style="font-size:8px;opacity:.6;letter-spacing:.5px;">Padaria / Bar</span></div>
+    </div>
+  </div>
+
+  <!-- Legenda IBGE -->
+  <div class="legend" id="leg-ibge" style="display:none;bottom:200px;">
+    <div class="leg-title">DOMICÍLIOS · CONDIÇÃO DE OCUPAÇÃO</div>
+    <div style="display:flex;flex-direction:column;gap:5px;margin-top:4px;">
+      <div style="display:flex;align-items:center;gap:6px;"><div style="width:9px;height:9px;border-radius:2px;background:rgba(255,107,107,.7);flex-shrink:0;"></div><span style="font-size:8px;opacity:.7;letter-spacing:.5px;">Predomin. Alugado — Lead quente</span></div>
+      <div style="display:flex;align-items:center;gap:6px;"><div style="width:9px;height:9px;border-radius:2px;background:rgba(196,160,64,.7);flex-shrink:0;"></div><span style="font-size:8px;opacity:.7;letter-spacing:.5px;">Predomin. Próprio — Upgrade/permuta</span></div>
+      <div style="display:flex;align-items:center;gap:6px;"><div style="width:9px;height:9px;border-radius:2px;background:rgba(77,255,110,.4);flex-shrink:0;"></div><span style="font-size:8px;opacity:.7;letter-spacing:.5px;">Misto / Cedido — Perfil MCMV</span></div>
+      <div style="display:flex;align-items:center;gap:6px;"><div style="width:9px;height:9px;border-radius:2px;background:rgba(150,150,150,.3);flex-shrink:0;"></div><span style="font-size:8px;opacity:.5;letter-spacing:.5px;">Sem dados</span></div>
     </div>
   </div>
 
@@ -546,9 +558,54 @@ function initMap() {
       }
     });
 
+    // ── IBGE layer ──
+    map.addSource('ibge-source', {
+      type: 'geojson',
+      data: { type: 'FeatureCollection', features: [] }
+    });
+    map.addLayer({
+      id: 'ibge-fill-layer',
+      type: 'fill',
+      source: 'ibge-source',
+      layout: { visibility: 'none' },
+      paint: {
+        'fill-color': [
+          'match', ['get', 'perfil_dom'],
+          'alugado',  'rgba(255,107,107,.55)',
+          'proprio',  'rgba(196,160,64,.55)',
+          'mcmv',     'rgba(77,255,110,.3)',
+          'rgba(150,150,150,.2)'
+        ],
+        'fill-opacity': 0.7
+      }
+    }, 'heat-layer'); // insere ABAIXO do heatmap
+    map.addLayer({
+      id: 'ibge-line-layer',
+      type: 'line',
+      source: 'ibge-source',
+      layout: { visibility: 'none' },
+      paint: {
+        'line-color': 'rgba(196,160,64,.2)',
+        'line-width': 0.5
+      }
+    }, 'heat-layer');
+
+    // Popup IBGE
+    const ibgePopup = new mapboxgl.Popup({ closeButton: false, offset: 8 });
+    map.on('click', 'ibge-fill-layer', e => {
+      const p = e.features[0].properties;
+      ibgePopup.setLngLat(e.lngLat).setHTML(`
+        <div class="popup-name">${p.nm_municipio || '–'} · ${p.nm_bairro || 'Setor'}</div>
+        <div class="popup-type" style="margin-top:4px;">
+          Alugado: ${p.alugado||0} · Próprio: ${p.proprio||0} · Cedido: ${p.cedido||0}
+        </div>
+      `).addTo(map);
+    });
+    map.on('mouseenter', 'ibge-fill-layer', () => { map.getCanvas().style.cursor = 'pointer'; });
+    map.on('mouseleave', 'ibge-fill-layer', () => { map.getCanvas().style.cursor = ''; ibgePopup.remove(); });
+
     // POI popup on click
-    const popup = new mapboxgl.Popup({ closeButton: false, offset: 12 });
-    map.on('click', 'poi-layer', e => {
+    const popup = new mapboxgl.Popup({ closeButton: false, offset: 12 });    map.on('click', 'poi-layer', e => {
       const props = e.features[0].properties;
       const typeInfo = POI_TYPES[props.poi_type] || POI_TYPES.other;
       popup.setLngLat(e.features[0].geometry.coordinates)
@@ -567,7 +624,7 @@ function initMap() {
 // ── DATA ──
 async function loadData() {
   const { data } = await sb.from('abordagens')
-    .select('id,latitude,longitude,tipo_contato,perfil_lead,interesse,created_at,agente_id,nome_lead,telefone_lead,observacao')
+    .select('id,latitude,longitude,tipo_contato,perfil_lead,interesse,created_at,agente_id')
     .order('created_at', { ascending: false });
   allData = data || [];
   applyFilters();
@@ -703,18 +760,13 @@ function updatePanel(data) {
   document.getElementById('sp-feed').innerHTML = data.slice(0, 12).map(a => {
     const hora = new Date(a.created_at).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' });
     const cor = cores[a.interesse] || '#4dff6e';
-    const telDigits = (a.telefone_lead||'').replace(/\D/g,'');
-    const waLink = telDigits.length >= 10
-      ? `<a href="https://wa.me/55${telDigits}" target="_blank" style="color:#25d366;font-size:7px;letter-spacing:.5px;text-decoration:none;margin-left:6px;">● WA</a>`
-      : '';
     return `<div class="feed-item">
       <div class="fi-row">
         <span class="fi-tipo">${(a.tipo_contato||'–').toUpperCase()}</span>
         <span class="fi-int" style="color:${cor}">${(a.interesse||'–').toUpperCase()}</span>
         <span class="fi-hora">${hora}</span>
       </div>
-      <div class="fi-coords" style="color:rgba(77,255,110,.6);font-size:8px;margin-top:3px;">${a.nome_lead||'–'}${waLink}</div>
-      <div class="fi-coords">${a.telefone_lead||''}</div>
+      <div class="fi-coords">${a.latitude?.toFixed(4)}, ${a.longitude?.toFixed(4)}</div>
     </div>`;
   }).join('') || '<div style="opacity:.28;font-size:10px;text-align:center;padding:20px;letter-spacing:1px;">Nenhuma abordagem nos filtros selecionados</div>';
 }
@@ -845,53 +897,85 @@ document.addEventListener('click', e => {
   if (!e.target.closest('.search-wrap')) closeDropdown();
 });
 
-// ── EXPORTAR CSV ──
-function exportarCSV() {
-  const periodo = parseInt(document.getElementById('f-periodo').value);
-  const interesse = document.getElementById('f-interesse').value;
-  const tipo = document.getElementById('f-tipo').value;
-  let filtered = [...allData];
-  if (periodo > 0) {
-    const desde = new Date();
-    desde.setDate(desde.getDate() - periodo);
-    filtered = filtered.filter(a => new Date(a.created_at) >= desde);
+// ── IBGE ──
+let ibgeVisible = false, ibgeLoaded = false;
+
+async function toggleIBGE() {
+  const btn = document.getElementById('btn-ibge');
+  const leg = document.getElementById('leg-ibge');
+  if (!ibgeVisible) {
+    btn.textContent = '⊙ CARREGANDO IBGE...';
+    btn.disabled = true;
+    if (!ibgeLoaded) await carregarIBGE();
+    map.setLayoutProperty('ibge-fill-layer', 'visibility', 'visible');
+    map.setLayoutProperty('ibge-line-layer', 'visibility', 'visible');
+    ibgeVisible = true;
+    btn.textContent = '⊗ OCULTAR IBGE';
+    btn.classList.add('active');
+    btn.disabled = false;
+    leg.style.display = 'block';
+  } else {
+    map.setLayoutProperty('ibge-fill-layer', 'visibility', 'none');
+    map.setLayoutProperty('ibge-line-layer', 'visibility', 'none');
+    ibgeVisible = false;
+    btn.textContent = '⊕ DOMICÍLIOS IBGE';
+    btn.classList.remove('active');
+    leg.style.display = 'none';
   }
-  if (interesse) filtered = filtered.filter(a => a.interesse === interesse);
-  if (tipo) filtered = filtered.filter(a => a.tipo_contato === tipo);
+}
 
-  if (!filtered.length) { alert('Nenhuma abordagem para exportar com os filtros atuais.'); return; }
-
-  const headers = ['Data','Hora','Nome Lead','Telefone','WhatsApp','Tipo Contato','Perfil Lead','Interesse','Observação','Latitude','Longitude'];
-  const rows = filtered.map(a => {
-    const dt = new Date(a.created_at);
-    const data = dt.toLocaleDateString('pt-BR');
-    const hora = dt.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
-    const telDigits = (a.telefone_lead||'').replace(/\D/g,'');
-    const waLink = telDigits.length >= 10 ? `https://wa.me/55${telDigits}` : '';
-    return [
-      data, hora,
-      a.nome_lead||'',
-      a.telefone_lead||'',
-      waLink,
-      a.tipo_contato||'',
-      a.perfil_lead||'',
-      a.interesse||'',
-      (a.observacao||'').replace(/,/g,' '),
-      a.latitude||'',
-      a.longitude||''
-    ].map(v => `"${v}"`).join(',');
+async function carregarIBGE() {
+  const bounds = map.getBounds();
+  const { data, error } = await sb.rpc('setores_no_viewport', {
+    min_lng: bounds.getWest(),
+    max_lng: bounds.getEast(),
+    min_lat: bounds.getSouth(),
+    max_lat: bounds.getNorth(),
+    limite: 2000
   });
 
-  const csv = [headers.join(','), ...rows].join('\n');
-  const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
-  const url = URL.createObjectURL(blob);
-  const link = document.createElement('a');
-  const periodoLabel = { 1: 'hoje', 7: '7dias', 30: '30dias', 0: 'tudo' }[periodo] || 'filtro';
-  link.href = url;
-  link.download = `cit-onda-leads-${periodoLabel}-${new Date().toISOString().split('T')[0]}.csv`;
-  link.click();
-  URL.revokeObjectURL(url);
+  if (error || !data || !data.length) {
+    // Fallback: carrega por município visível
+    const { data: setores } = await sb
+      .from('setores_censitarios')
+      .select('id,cd_setor,nm_municipio,nm_bairro,alugado,proprio,cedido,perfil_dom,geojson_geom')
+      .limit(2000);
+    if (setores) renderIBGE(setores);
+    return;
+  }
+  renderIBGE(data);
+  ibgeLoaded = true;
 }
+
+function renderIBGE(setores) {
+  const features = setores.filter(s => s.geojson_geom).map(s => {
+    let geom;
+    try { geom = typeof s.geojson_geom === 'string' ? JSON.parse(s.geojson_geom) : s.geojson_geom; }
+    catch(e) { return null; }
+    return {
+      type: 'Feature',
+      geometry: geom,
+      properties: {
+        cd_setor: s.cd_setor,
+        nm_municipio: s.nm_municipio,
+        nm_bairro: s.nm_bairro,
+        alugado: s.alugado || 0,
+        proprio: s.proprio || 0,
+        cedido: s.cedido || 0,
+        perfil_dom: s.perfil_dom || 'sem_dado'
+      }
+    };
+  }).filter(Boolean);
+
+  if (map.getSource('ibge-source')) {
+    map.getSource('ibge-source').setData({ type: 'FeatureCollection', features });
+  }
+}
+
+// Recarrega IBGE ao mover mapa
+map && map.on && map.on('moveend', () => {
+  if (ibgeVisible) { ibgeLoaded = false; carregarIBGE(); }
+});
 
 // ── SESSION RESTORE ──
 sb.auth.onAuthStateChange(async (event, session) => {
