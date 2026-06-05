@@ -328,25 +328,38 @@ async function fetchPOIs(lat, lng, radius = 1500) {
     node["amenity"="marketplace"](around:${radius},${lat},${lng});
   );out body;`;
 
-  try {
-    const resp = await fetch('https://overpass-api.de/api/interpreter', {
-      method: 'POST',
-      body: 'data=' + encodeURIComponent(q)
-    });
-    const data = await resp.json();
-    return data.elements.map(el => ({
-      type: 'Feature',
-      geometry: { type: 'Point', coordinates: [el.lon, el.lat] },
-      properties: {
-        name: el.tags?.name || el.tags?.['name:pt'] || '',
-        poi_type: getPOIType(el.tags),
-        amenity: el.tags?.amenity || el.tags?.shop || el.tags?.highway || ''
-      }
-    }));
-  } catch(e) {
-    console.error('Erro Overpass:', e);
-    return [];
+  const endpoints = [
+    'https://overpass-api.de/api/interpreter',
+    'https://overpass.kumi.systems/api/interpreter',
+    'https://overpass.openstreetmap.fr/api/interpreter'
+  ];
+
+  for (const endpoint of endpoints) {
+    try {
+      const resp = await fetch(endpoint, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: 'data=' + encodeURIComponent(q)
+      });
+      if (!resp.ok) continue;
+      const data = await resp.json();
+      if (!data.elements || data.elements.length === 0) continue;
+      return data.elements
+        .filter(el => el.lat && el.lon)
+        .map(el => ({
+          type: 'Feature',
+          geometry: { type: 'Point', coordinates: [el.lon, el.lat] },
+          properties: {
+            name: el.tags?.name || el.tags?.['name:pt'] || '',
+            poi_type: getPOIType(el.tags),
+            amenity: el.tags?.amenity || el.tags?.shop || el.tags?.highway || ''
+          }
+        }));
+    } catch(e) {
+      continue;
+    }
   }
+  return [];
 }
 
 // ── AUTH ──
