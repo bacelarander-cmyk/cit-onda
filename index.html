@@ -38,8 +38,6 @@ input::placeholder{color:rgba(77,255,110,.28);font-size:11px;letter-spacing:2px;
 
 /* ── DASHBOARD ── */
 #s-dash{position:fixed;inset:0;display:none;}
-
-/* Map */
 #map{position:absolute;inset:0;}
 
 /* Header */
@@ -64,7 +62,7 @@ input::placeholder{color:rgba(77,255,110,.28);font-size:11px;letter-spacing:2px;
   overflow-y:auto;
   backdrop-filter:blur(8px);
 }
-.sp-section{padding:16px 18px;border-bottom:1px solid #0d2511;}
+.sp-section{padding:14px 18px;border-bottom:1px solid #0d2511;}
 .sp-title{font-size:8px;letter-spacing:2.5px;opacity:.4;margin-bottom:12px;text-transform:uppercase;}
 
 .metric-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
@@ -73,7 +71,7 @@ input::placeholder{color:rgba(77,255,110,.28);font-size:11px;letter-spacing:2px;
 .metric-l{font-size:7px;letter-spacing:1.5px;opacity:.35;margin-top:3px;}
 
 .bar-row{display:flex;align-items:center;gap:8px;margin-bottom:7px;}
-.bar-label{font-size:9px;letter-spacing:1px;opacity:.55;width:62px;flex-shrink:0;}
+.bar-label{font-size:9px;letter-spacing:1px;opacity:.55;width:72px;flex-shrink:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 .bar-track{flex:1;height:4px;background:rgba(77,255,110,.1);border-radius:2px;overflow:hidden;}
 .bar-fill{height:100%;background:#4dff6e;border-radius:2px;transition:width .4s;}
 .bar-val{font-size:9px;opacity:.55;width:24px;text-align:right;flex-shrink:0;}
@@ -85,21 +83,39 @@ input::placeholder{color:rgba(77,255,110,.28);font-size:11px;letter-spacing:2px;
 .fi-int{font-size:9px;letter-spacing:1px;}
 .fi-coords{font-size:7px;opacity:.22;margin-top:2px;letter-spacing:.5px;}
 
+/* POI dot legend */
+.poi-dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px;flex-shrink:0;}
+.poi-row{display:flex;align-items:center;margin-bottom:7px;}
+.poi-label{font-size:9px;letter-spacing:1px;opacity:.6;flex:1;}
+.poi-count{font-size:9px;opacity:.45;font-weight:bold;}
+
+/* POI loading */
+.poi-loading{font-size:9px;letter-spacing:1px;opacity:.4;text-align:center;padding:10px 0;}
+
 /* Filter bar */
 .filter-bar{
   position:absolute;top:45px;left:260px;right:0;z-index:9;
-  display:flex;align-items:center;gap:12px;
-  padding:8px 16px;
+  display:flex;align-items:center;gap:8px;
+  padding:7px 14px;
   background:rgba(3,15,6,.7);
   border-bottom:1px solid #0d2511;
   backdrop-filter:blur(6px);
+  flex-wrap:wrap;
 }
 .filter-select{
   background:transparent;border:1px solid #0d2511;
   color:rgba(77,255,110,.65);font-family:'Courier New',monospace;font-size:9px;
-  padding:5px 10px;letter-spacing:1px;outline:none;cursor:pointer;border-radius:2px;
+  padding:5px 8px;letter-spacing:1px;outline:none;cursor:pointer;border-radius:2px;
 }
 .filter-select option{background:#030f06;color:#4dff6e;}
+.filter-btn{
+  background:transparent;border:1px solid #0d2511;
+  color:rgba(77,255,110,.55);font-family:'Courier New',monospace;font-size:9px;
+  padding:5px 10px;letter-spacing:1px;cursor:pointer;border-radius:2px;
+  transition:all .15s;white-space:nowrap;
+}
+.filter-btn:hover{border-color:rgba(77,255,110,.4);color:#4dff6e;}
+.filter-btn.active{background:rgba(77,255,110,.12);border-color:rgba(77,255,110,.5);color:#4dff6e;}
 .live-dot{
   display:flex;align-items:center;gap:5px;font-size:8px;letter-spacing:1.5px;opacity:.5;margin-left:auto;
 }
@@ -109,26 +125,37 @@ input::placeholder{color:rgba(77,255,110,.28);font-size:11px;letter-spacing:2px;
 /* Status bar */
 .status-bar{
   position:absolute;bottom:0;left:0;right:0;z-index:10;
-  display:flex;gap:1px;
-  background:#0d2511;
+  display:flex;gap:1px;background:#0d2511;
 }
-.sb-item{
-  flex:1;padding:7px 14px;background:rgba(3,15,6,.92);
-  font-size:8px;letter-spacing:1.5px;
-}
+.sb-item{flex:1;padding:7px 14px;background:rgba(3,15,6,.92);}
 .sb-n{font-size:15px;font-weight:bold;color:#4dff6e;line-height:1;margin-bottom:2px;}
-.sb-l{opacity:.32;}
+.sb-l{font-size:8px;letter-spacing:1.2px;opacity:.32;}
 
-/* Legend */
+/* Legends */
 .legend{
   position:absolute;right:16px;bottom:52px;z-index:10;
-  background:rgba(3,15,6,.88);border:1px solid #0d2511;border-radius:4px;
-  padding:12px 14px;backdrop-filter:blur(6px);
+  background:rgba(3,15,6,.9);border:1px solid #0d2511;border-radius:4px;
+  padding:12px 14px;backdrop-filter:blur(6px);min-width:150px;
 }
 .leg-title{font-size:7px;letter-spacing:2px;opacity:.45;margin-bottom:8px;}
 .leg-bar{height:10px;width:140px;border-radius:2px;margin-bottom:6px;
   background:linear-gradient(to right,rgba(0,100,255,.8),rgba(0,210,255,.8),rgba(0,222,85,.8),rgba(255,108,0,.9),rgba(255,22,0,1));}
 .leg-labels{display:flex;justify-content:space-between;font-size:7px;opacity:.4;letter-spacing:.5px;}
+
+/* Mapbox popup custom */
+.mapboxgl-popup-content{
+  background:rgba(3,15,6,.95)!important;
+  border:1px solid #0d2511!important;
+  color:#4dff6e!important;
+  font-family:'Courier New',monospace!important;
+  font-size:10px!important;
+  padding:10px 14px!important;
+  border-radius:3px!important;
+  letter-spacing:.5px!important;
+}
+.mapboxgl-popup-tip{border-top-color:rgba(3,15,6,.95)!important;}
+.popup-name{font-weight:bold;margin-bottom:4px;font-size:11px;}
+.popup-type{font-size:8px;letter-spacing:1.5px;opacity:.55;}
 </style>
 </head>
 <body>
@@ -146,7 +173,6 @@ input::placeholder{color:rgba(77,255,110,.28);font-size:11px;letter-spacing:2px;
 <!-- ════ DASHBOARD ════ -->
 <div id="s-dash">
 
-  <!-- Map -->
   <div id="map"></div>
 
   <!-- Header -->
@@ -180,8 +206,17 @@ input::placeholder{color:rgba(77,255,110,.28);font-size:11px;letter-spacing:2px;
       <div id="sp-tipo-bars"></div>
     </div>
 
+    <!-- POI Section -->
+    <div class="sp-section" id="sp-poi-section">
+      <div class="sp-title" style="display:flex;justify-content:space-between;">
+        <span>Pontos de Concentração</span>
+        <span id="sp-poi-total" style="color:#4dff6e;font-size:8px;letter-spacing:1px;"></span>
+      </div>
+      <div id="sp-poi-list"><div class="poi-loading">Ative os POIs no mapa</div></div>
+    </div>
+
     <div class="sp-section">
-      <div class="sp-title" style="display:flex;justify-content:space-between;align-items:center;">
+      <div class="sp-title" style="display:flex;justify-content:space-between;">
         <span>Últimas Abordagens</span>
         <span id="sp-live" style="color:#4dff6e;font-size:7px;letter-spacing:1px;"></span>
       </div>
@@ -211,23 +246,37 @@ input::placeholder{color:rgba(77,255,110,.28);font-size:11px;letter-spacing:2px;
       <option value="indicacao">INDICAÇÃO</option>
       <option value="passivo">PASSIVO</option>
     </select>
+    <button class="filter-btn" id="btn-poi" onclick="togglePOIs()">⊕ PONTOS DE CONCENTRAÇÃO</button>
     <div class="live-dot"><div class="dot"></div>TEMPO REAL</div>
   </div>
 
-  <!-- Legend -->
-  <div class="legend">
-    <div class="leg-title">INTENSIDADE</div>
+  <!-- Legends -->
+  <div class="legend" id="leg-heat">
+    <div class="leg-title">INTENSIDADE DE LEADS</div>
     <div class="leg-bar"></div>
     <div class="leg-labels"><span>BAIXA</span><span>MÉDIA</span><span>ALTA</span></div>
   </div>
 
+  <div class="legend" id="leg-poi" style="display:none;bottom:120px;">
+    <div class="leg-title">PONTOS DE CONCENTRAÇÃO</div>
+    <div style="display:flex;flex-direction:column;gap:5px;margin-top:4px;">
+      <div style="display:flex;align-items:center;gap:6px;"><div style="width:9px;height:9px;border-radius:50%;background:#4fc3f7;flex-shrink:0;"></div><span style="font-size:8px;opacity:.6;letter-spacing:.5px;">Ponto de Ônibus</span></div>
+      <div style="display:flex;align-items:center;gap:6px;"><div style="width:9px;height:9px;border-radius:50%;background:#ffb74d;flex-shrink:0;"></div><span style="font-size:8px;opacity:.6;letter-spacing:.5px;">Supermercado / Comércio</span></div>
+      <div style="display:flex;align-items:center;gap:6px;"><div style="width:9px;height:9px;border-radius:50%;background:#a5d6a7;flex-shrink:0;"></div><span style="font-size:8px;opacity:.6;letter-spacing:.5px;">Farmácia</span></div>
+      <div style="display:flex;align-items:center;gap:6px;"><div style="width:9px;height:9px;border-radius:50%;background:#fff176;flex-shrink:0;"></div><span style="font-size:8px;opacity:.6;letter-spacing:.5px;">Escola</span></div>
+      <div style="display:flex;align-items:center;gap:6px;"><div style="width:9px;height:9px;border-radius:50%;background:#ce93d8;flex-shrink:0;"></div><span style="font-size:8px;opacity:.6;letter-spacing:.5px;">Igreja</span></div>
+      <div style="display:flex;align-items:center;gap:6px;"><div style="width:9px;height:9px;border-radius:50%;background:#ffcc80;flex-shrink:0;"></div><span style="font-size:8px;opacity:.6;letter-spacing:.5px;">Padaria / Bar</span></div>
+    </div>
+  </div>
+
   <!-- Status Bar -->
-  <div class="status-bar" id="status-bar">
+  <div class="status-bar">
     <div class="sb-item"><div class="sb-n" id="sb-total">0</div><div class="sb-l">ABORDAGENS</div></div>
     <div class="sb-item"><div class="sb-n" id="sb-hoje">0</div><div class="sb-l">HOJE</div></div>
     <div class="sb-item"><div class="sb-n" id="sb-altos" style="color:#ff8c00;">0</div><div class="sb-l">ALTO INTERESSE</div></div>
+    <div class="sb-item"><div class="sb-n" id="sb-pois">0</div><div class="sb-l">POIs MAPEADOS</div></div>
     <div class="sb-item"><div class="sb-n" id="sb-agentes">0</div><div class="sb-l">AGENTES</div></div>
-    <div class="sb-item" id="sb-logout" onclick="doLogout()" style="cursor:pointer;flex:0;padding:7px 20px;opacity:.35;">SAIR</div>
+    <div class="sb-item" onclick="doLogout()" style="cursor:pointer;flex:0;padding:7px 18px;opacity:.3;">SAIR</div>
   </div>
 
 </div>
@@ -242,8 +291,63 @@ const MAPBOX_TOKEN = 'pk.eyJ1IjoiYW5kZXJvZGVmZW5zb3IiLCJhIjoiY21xMTN2YWRtMDhuZjJ
 const sb = supabase.createClient(SUPA_URL, SUPA_KEY);
 mapboxgl.accessToken = MAPBOX_TOKEN;
 
-let map = null, allData = [], user = null;
+let map = null, allData = [], user = null, poisVisible = false, poisLoaded = false;
 const hoje = new Date().toISOString().split('T')[0];
+
+// ── POI CONFIG ──
+const POI_TYPES = {
+  bus_stop:       { color: '#4fc3f7', label: 'Ponto de Ônibus',       score: 3 },
+  supermarket:    { color: '#ffb74d', label: 'Supermercado/Comércio', score: 2 },
+  pharmacy:       { color: '#a5d6a7', label: 'Farmácia',               score: 2 },
+  school:         { color: '#fff176', label: 'Escola',                 score: 2 },
+  place_of_worship:{ color: '#ce93d8', label: 'Igreja',                score: 2 },
+  bakery:         { color: '#ffcc80', label: 'Padaria/Bar',            score: 1 },
+  other:          { color: 'rgba(77,255,110,.4)', label: 'Outros',     score: 1 },
+};
+
+function getPOIType(tags) {
+  if (!tags) return 'other';
+  if (tags.highway === 'bus_stop') return 'bus_stop';
+  if (tags.amenity === 'pharmacy' || tags.shop === 'pharmacy') return 'pharmacy';
+  if (tags.shop === 'supermarket' || tags.shop === 'convenience' || tags.shop === 'grocery' || tags.amenity === 'marketplace') return 'supermarket';
+  if (tags.amenity === 'school' || tags.amenity === 'university' || tags.amenity === 'college') return 'school';
+  if (tags.amenity === 'place_of_worship') return 'place_of_worship';
+  if (tags.shop === 'bakery' || tags.amenity === 'bar' || tags.amenity === 'restaurant' || tags.amenity === 'fast_food') return 'bakery';
+  return 'other';
+}
+
+async function fetchPOIs(lat, lng, radius = 1500) {
+  const q = `[out:json][timeout:30];(
+    node["highway"="bus_stop"](around:${radius},${lat},${lng});
+    node["amenity"="pharmacy"](around:${radius},${lat},${lng});
+    node["shop"~"supermarket|convenience|grocery"](around:${radius},${lat},${lng});
+    node["amenity"="school"](around:${radius},${lat},${lng});
+    node["amenity"="place_of_worship"](around:${radius},${lat},${lng});
+    node["shop"="bakery"](around:${radius},${lat},${lng});
+    node["amenity"~"bar|restaurant|fast_food"](around:${radius},${lat},${lng});
+    node["amenity"="marketplace"](around:${radius},${lat},${lng});
+  );out body;`;
+
+  try {
+    const resp = await fetch('https://overpass-api.de/api/interpreter', {
+      method: 'POST',
+      body: 'data=' + encodeURIComponent(q)
+    });
+    const data = await resp.json();
+    return data.elements.map(el => ({
+      type: 'Feature',
+      geometry: { type: 'Point', coordinates: [el.lon, el.lat] },
+      properties: {
+        name: el.tags?.name || el.tags?.['name:pt'] || '',
+        poi_type: getPOIType(el.tags),
+        amenity: el.tags?.amenity || el.tags?.shop || el.tags?.highway || ''
+      }
+    }));
+  } catch(e) {
+    console.error('Erro Overpass:', e);
+    return [];
+  }
+}
 
 // ── AUTH ──
 async function doLogin() {
@@ -291,7 +395,9 @@ function initMap() {
     center: [-47.0626, -22.9068],
     zoom: 12
   });
+
   map.on('load', () => {
+    // ── Heatmap layer ──
     map.addSource('heat-source', {
       type: 'geojson',
       data: { type: 'FeatureCollection', features: [] }
@@ -301,10 +407,7 @@ function initMap() {
       type: 'heatmap',
       source: 'heat-source',
       paint: {
-        'heatmap-weight': [
-          'match', ['get', 'interesse'],
-          'alto', 1, 'medio', 0.6, 'baixo', 0.3, 0.5
-        ],
+        'heatmap-weight': ['match', ['get', 'interesse'], 'alto', 1, 'medio', 0.6, 'baixo', 0.3, 0.5],
         'heatmap-intensity': ['interpolate', ['linear'], ['zoom'], 0, 1, 14, 4],
         'heatmap-color': [
           'interpolate', ['linear'], ['heatmap-density'],
@@ -330,17 +433,56 @@ function initMap() {
       minzoom: 13,
       paint: {
         'circle-radius': 5,
-        'circle-color': [
-          'match', ['get', 'interesse'],
-          'alto', '#ff8c00', 'medio', '#4dff6e', 'baixo', 'rgba(77,255,110,.4)', '#4dff6e'
-        ],
+        'circle-color': ['match', ['get', 'interesse'], 'alto', '#ff8c00', 'medio', '#4dff6e', 'baixo', 'rgba(77,255,110,.4)', '#4dff6e'],
         'circle-opacity': 0.85,
         'circle-stroke-width': 1,
         'circle-stroke-color': '#030f06'
       }
     });
+
+    // ── POI layer ──
+    map.addSource('poi-source', {
+      type: 'geojson',
+      data: { type: 'FeatureCollection', features: [] }
+    });
+    map.addLayer({
+      id: 'poi-layer',
+      type: 'circle',
+      source: 'poi-source',
+      layout: { visibility: 'none' },
+      paint: {
+        'circle-radius': ['interpolate', ['linear'], ['zoom'], 10, 4, 14, 8],
+        'circle-color': [
+          'match', ['get', 'poi_type'],
+          'bus_stop', '#4fc3f7',
+          'supermarket', '#ffb74d',
+          'pharmacy', '#a5d6a7',
+          'school', '#fff176',
+          'place_of_worship', '#ce93d8',
+          'bakery', '#ffcc80',
+          'rgba(77,255,110,.4)'
+        ],
+        'circle-opacity': 0.85,
+        'circle-stroke-width': 1,
+        'circle-stroke-color': 'rgba(3,15,6,.6)'
+      }
+    });
+
+    // POI popup on click
+    const popup = new mapboxgl.Popup({ closeButton: false, offset: 12 });
+    map.on('click', 'poi-layer', e => {
+      const props = e.features[0].properties;
+      const typeInfo = POI_TYPES[props.poi_type] || POI_TYPES.other;
+      popup.setLngLat(e.features[0].geometry.coordinates)
+        .setHTML(`<div class="popup-name">${props.name || 'Sem nome'}</div><div class="popup-type">${typeInfo.label.toUpperCase()}</div>`)
+        .addTo(map);
+    });
+    map.on('mouseenter', 'poi-layer', () => { map.getCanvas().style.cursor = 'pointer'; });
+    map.on('mouseleave', 'poi-layer', () => { map.getCanvas().style.cursor = ''; popup.remove(); });
+
     renderMap(allData);
   });
+
   map.addControl(new mapboxgl.NavigationControl({ showCompass: false }), 'top-right');
 }
 
@@ -371,13 +513,11 @@ function applyFilters() {
 
 function renderMap(data) {
   if (!map || !map.getSource('heat-source')) return;
-  const features = data
-    .filter(a => a.latitude && a.longitude)
-    .map(a => ({
-      type: 'Feature',
-      geometry: { type: 'Point', coordinates: [a.longitude, a.latitude] },
-      properties: { interesse: a.interesse, tipo: a.tipo_contato }
-    }));
+  const features = data.filter(a => a.latitude && a.longitude).map(a => ({
+    type: 'Feature',
+    geometry: { type: 'Point', coordinates: [a.longitude, a.latitude] },
+    properties: { interesse: a.interesse, tipo: a.tipo_contato }
+  }));
   map.getSource('heat-source').setData({ type: 'FeatureCollection', features });
   map.getSource('points-source').setData({ type: 'FeatureCollection', features });
   if (features.length > 0 && features.length <= 500) {
@@ -385,6 +525,69 @@ function renderMap(data) {
     const bounds = coords.reduce((b, c) => b.extend(c), new mapboxgl.LngLatBounds(coords[0], coords[0]));
     map.fitBounds(bounds, { padding: 80, maxZoom: 14, duration: 800 });
   }
+}
+
+// ── POIs ──
+async function togglePOIs() {
+  const btn = document.getElementById('btn-poi');
+  const legPoi = document.getElementById('leg-poi');
+
+  if (!poisVisible) {
+    btn.classList.add('active');
+    btn.textContent = '⊙ CARREGANDO POIs...';
+    btn.disabled = true;
+
+    if (!poisLoaded) {
+      // Get center from empreendimentos or map center
+      const { data: emps } = await sb.from('empreendimentos').select('latitude,longitude').eq('ativo', true).limit(1);
+      const lat = emps?.[0]?.latitude || map.getCenter().lat;
+      const lng = emps?.[0]?.longitude || map.getCenter().lng;
+
+      const features = await fetchPOIs(lat, lng);
+      if (map.getSource('poi-source')) {
+        map.getSource('poi-source').setData({ type: 'FeatureCollection', features });
+      }
+      updatePOIPanel(features);
+      poisLoaded = true;
+    }
+
+    map.setLayoutProperty('poi-layer', 'visibility', 'visible');
+    poisVisible = true;
+    btn.textContent = '⊗ OCULTAR POIs';
+    btn.disabled = false;
+    legPoi.style.display = 'block';
+  } else {
+    map.setLayoutProperty('poi-layer', 'visibility', 'none');
+    poisVisible = false;
+    btn.classList.remove('active');
+    btn.textContent = '⊕ PONTOS DE CONCENTRAÇÃO';
+    legPoi.style.display = 'none';
+  }
+}
+
+function updatePOIPanel(features) {
+  const counts = {};
+  Object.keys(POI_TYPES).forEach(k => { counts[k] = 0; });
+  features.forEach(f => {
+    const t = f.properties.poi_type;
+    if (counts[t] !== undefined) counts[t]++;
+    else counts['other']++;
+  });
+
+  const total = features.length;
+  document.getElementById('sp-poi-total').textContent = total + ' POIs';
+  document.getElementById('sb-pois').textContent = total;
+
+  const sorted = Object.entries(counts).filter(([,v]) => v > 0).sort((a,b) => b[1]-a[1]);
+  document.getElementById('sp-poi-list').innerHTML = sorted.map(([type, count]) => {
+    const info = POI_TYPES[type];
+    const pct = Math.round(count / total * 100);
+    return `<div class="poi-row">
+      <div class="poi-dot" style="background:${info.color}"></div>
+      <div class="poi-label">${info.label}</div>
+      <div class="poi-count">${count}</div>
+    </div>`;
+  }).join('') || '<div class="poi-loading">Nenhum POI encontrado</div>';
 }
 
 // ── PANEL ──
@@ -398,7 +601,6 @@ function updatePanel(data) {
   ['sp-altos','sb-altos'].forEach(id => document.getElementById(id).textContent = altos.length);
   ['sp-agentes','sb-agentes'].forEach(id => document.getElementById(id).textContent = agentesUnicos);
 
-  // Interesse bars
   const iMap = { alto: 0, medio: 0, baixo: 0 };
   data.forEach(a => { if (iMap[a.interesse] !== undefined) iMap[a.interesse]++; });
   const iMax = Math.max(...Object.values(iMap), 1);
@@ -409,7 +611,6 @@ function updatePanel(data) {
       <div class="bar-val">${v}</div>
     </div>`).join('');
 
-  // Tipo bars
   const tMap = { ativo: 0, digital: 0, indicacao: 0, passivo: 0 };
   data.forEach(a => { if (tMap[a.tipo_contato] !== undefined) tMap[a.tipo_contato]++; });
   const tMax = Math.max(...Object.values(tMap), 1);
@@ -420,23 +621,19 @@ function updatePanel(data) {
       <div class="bar-val">${v}</div>
     </div>`).join('');
 
-  // Feed (last 12)
   const cores = { alto: '#ff8c00', medio: '#4dff6e', baixo: 'rgba(77,255,110,.4)' };
-  const feed = data.slice(0, 12);
-  document.getElementById('sp-feed').innerHTML = feed.length
-    ? feed.map(a => {
-        const hora = new Date(a.created_at).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' });
-        const cor = cores[a.interesse] || '#4dff6e';
-        return `<div class="feed-item">
-          <div class="fi-row">
-            <span class="fi-tipo">${(a.tipo_contato||'–').toUpperCase()}</span>
-            <span class="fi-int" style="color:${cor}">${(a.interesse||'–').toUpperCase()}</span>
-            <span class="fi-hora">${hora}</span>
-          </div>
-          <div class="fi-coords">${a.latitude?.toFixed(4)}, ${a.longitude?.toFixed(4)}</div>
-        </div>`;
-      }).join('')
-    : '<div style="opacity:.28;font-size:10px;text-align:center;padding:20px;letter-spacing:1px;">Nenhuma abordagem nos filtros selecionados</div>';
+  document.getElementById('sp-feed').innerHTML = data.slice(0, 12).map(a => {
+    const hora = new Date(a.created_at).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' });
+    const cor = cores[a.interesse] || '#4dff6e';
+    return `<div class="feed-item">
+      <div class="fi-row">
+        <span class="fi-tipo">${(a.tipo_contato||'–').toUpperCase()}</span>
+        <span class="fi-int" style="color:${cor}">${(a.interesse||'–').toUpperCase()}</span>
+        <span class="fi-hora">${hora}</span>
+      </div>
+      <div class="fi-coords">${a.latitude?.toFixed(4)}, ${a.longitude?.toFixed(4)}</div>
+    </div>`;
+  }).join('') || '<div style="opacity:.28;font-size:10px;text-align:center;padding:20px;letter-spacing:1px;">Nenhuma abordagem nos filtros selecionados</div>';
 }
 
 // ── REALTIME ──
@@ -446,29 +643,23 @@ function startRealtime() {
       allData.unshift(payload.new);
       applyFilters();
       const el = document.getElementById('sp-live');
-      if (el) {
-        el.textContent = '● NOVO';
-        setTimeout(() => { el.textContent = ''; }, 3000);
-      }
+      if (el) { el.textContent = '● NOVO'; setTimeout(() => { el.textContent = ''; }, 3000); }
     })
     .subscribe();
 }
 
 // ── CLOCK ──
 function startClock() {
-  function tick() {
+  const tick = () => {
     const d = new Date(), p = n => String(n).padStart(2,'0');
     document.getElementById('clk').textContent = `${p(d.getHours())}:${p(d.getMinutes())}:${p(d.getSeconds())}`;
-  }
+  };
   setInterval(tick, 1000); tick();
 }
 
 // ── SESSION RESTORE ──
 sb.auth.onAuthStateChange(async (event, session) => {
-  if (session?.user && !user) {
-    user = session.user;
-    showDash();
-  }
+  if (session?.user && !user) { user = session.user; showDash(); }
 });
 </script>
 </body>
