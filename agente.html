@@ -70,13 +70,20 @@ textarea::placeholder{color:rgba(77,255,110,.22);font-size:11px;letter-spacing:1
 .err-msg{color:#ff4444;font-size:10px;letter-spacing:1px;text-align:center;min-height:18px;margin-bottom:8px;}
 .spin{display:inline-block;animation:rotate 1s linear infinite;}
 @keyframes rotate{to{transform:rotate(360deg);}}
-.agente-status{font-size:8px;letter-spacing:1px;opacity:.4;text-align:center;margin-bottom:16px;}
+#s-loading{align-items:center;justify-content:center;}
+.loading-txt{font-size:10px;letter-spacing:3px;opacity:.4;animation:blink 1.2s ease-in-out infinite;}
+@keyframes blink{0%,100%{opacity:.4;}50%{opacity:.9;};}
 </style>
 </head>
 <body>
 
+<!-- LOADING -->
+<div id="s-loading" class="screen active">
+  <div class="loading-txt">⊙ VERIFICANDO SESSÃO...</div>
+</div>
+
 <!-- LOGIN -->
-<div id="s-login" class="screen active">
+<div id="s-login" class="screen">
   <div class="logo">▣ C.I.T.</div>
   <div class="logo-sub">AGENTE · ONDA DEFESA DE TERRITÓRIO</div>
   <input type="email" id="l-email" placeholder="SEU EMAIL" autocomplete="email" inputmode="email">
@@ -167,7 +174,16 @@ textarea::placeholder{color:rgba(77,255,110,.22);font-size:11px;letter-spacing:1
 <script>
 const SUPA_URL = 'https://iaawdroypmeljrfuwawx.supabase.co';
 const SUPA_KEY = 'sb_publishable_Do90V25eFWYTb-UfSQLGRQ_I1LeN0XR';
-const sb = supabase.createClient(SUPA_URL, SUPA_KEY);
+
+// Persistência explícita de sessão
+const sb = supabase.createClient(SUPA_URL, SUPA_KEY, {
+  auth: {
+    persistSession: true,
+    autoRefreshToken: true,
+    detectSessionInUrl: false,
+    storage: window.localStorage
+  }
+});
 
 let user = null, agente = null, gps = null, watchId = null;
 const form = { tipo: null, perfil: null, interesse: null };
@@ -178,6 +194,28 @@ function show(id) {
   const el = document.getElementById(id);
   if (el) el.classList.add('active');
   window.scrollTo(0, 0);
+}
+
+// ── INIT — verifica sessão ao carregar ──
+async function init() {
+  try {
+    const { data: { session }, error } = await sb.auth.getSession();
+    if (error || !session) {
+      // Sessão inválida ou expirada — limpa e vai para login
+      await sb.auth.signOut();
+      show('s-login');
+      return;
+    }
+    // Sessão válida — restaura
+    user = session.user;
+    await loadAgente();
+    show('s-main');
+    startGPS();
+    loadStats();
+    loadFeed();
+  } catch (e) {
+    show('s-login');
+  }
 }
 
 // ── AUTH ──
@@ -205,11 +243,10 @@ async function doLogin() {
   await loadFeed();
 }
 
-// ── LOAD AGENTE — corrigido ──
+// ── LOAD AGENTE ──
 async function loadAgente() {
   if (!user) return;
 
-  // 1. Tenta buscar agente existente
   const { data, error: fetchErr } = await sb
     .from('agentes')
     .select('*')
@@ -222,7 +259,6 @@ async function loadAgente() {
     return;
   }
 
-  // 2. Não encontrou — tenta criar
   const nome = user.user_metadata?.nome
     || user.user_metadata?.full_name
     || user.email.split('@')[0];
@@ -239,15 +275,9 @@ async function loadAgente() {
     return;
   }
 
-  // 3. Insert falhou (RLS ou outro motivo) — usa user diretamente como fallback
-  console.warn('Tabela agentes indisponível, usando user como fallback.', insertErr || fetchErr);
-  agente = {
-    id: user.id,           // usa o próprio user.id como agente_id
-    user_id: user.id,
-    nome: user.user_metadata?.nome || user.email.split('@')[0],
-    empreendimento_id: null
-  };
-  document.getElementById('m-name').textContent = agente.nome.toUpperCase();
+  console.warn('Erro ao criar agente:', insertErr || fetchErr);
+  // Sem fallback de user.id — exige registro válido na tabela agentes
+  agente = null;
 }
 
 function doLogout() {
@@ -355,7 +385,6 @@ async function submitAbordagem() {
   if (!form.interesse) { err.textContent = 'SELECIONE O NÍVEL DE INTERESSE'; return; }
   if (!gps)            { err.textContent = 'AGUARDANDO SINAL DE GPS...'; return; }
 
-  // ── Garantia extra: tenta recarregar agente se ainda null ──
   if (!agente) {
     err.textContent = '⊙ IDENTIFICANDO AGENTE...';
     await loadAgente();
@@ -394,17 +423,8 @@ async function submitAbordagem() {
   show('s-success');
 }
 
-// ── SESSION RESTORE ──
-sb.auth.onAuthStateChange(async (event, session) => {
-  if (session?.user && !user) {
-    user = session.user;
-    await loadAgente();
-    show('s-main');
-    startGPS();
-    loadStats();
-    loadFeed();
-  }
-});
+// ── INICIA ──
+init();
 </script>
 </body>
 </html>
