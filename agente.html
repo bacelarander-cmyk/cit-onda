@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#030f06">
+<title>C.I.T. — Agente</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+html,body{height:100%;background:#030f06;color:#4dff6e;font-family:'Courier New',monospace;overflow-x:hidden;}
+
+.screen{display:none;flex-direction:column;min-height:100vh;}
+.screen.active{display:flex;}
+
+/* ── LOGIN ── */
+#s-login{align-items:center;justify-content:center;padding:40px 28px;}
+.logo{font-size:32px;font-weight:bold;letter-spacing:4px;margin-bottom:6px;text-align:center;}
+.logo-sub{font-size:9px;letter-spacing:3px;opacity:.4;margin-bottom:52px;text-align:center;}
+input[type=email],input[type=password]{
+  display:block;width:100%;max-width:340px;
+  background:transparent;border:none;border-bottom:1px solid #1a4020;
+  color:#4dff6e;font-family:'Courier New',monospace;font-size:15px;
+  padding:14px 4px;margin-bottom:20px;outline:none;letter-spacing:1px;
+}
+input::placeholder{color:rgba(77,255,110,.28);font-size:11px;letter-spacing:2px;}
+
+/* ── BUTTONS ── */
+.btn{
+  display:block;width:100%;max-width:340px;
+  background:#4dff6e;color:#030f06;
+  font-family:'Courier New',monospace;font-size:11px;font-weight:bold;
+  letter-spacing:3px;padding:17px;border:none;cursor:pointer;border-radius:2px;margin-top:6px;
+  transition:opacity .15s;
+}
+.btn:active{opacity:.75;}
+.btn.sec{background:transparent;color:rgba(77,255,110,.45);border:1px solid #0d2511;margin-top:10px;}
+.btn.outline{background:transparent;color:#4dff6e;border:1px solid rgba(77,255,110,.35);margin-top:10px;}
+
+/* ── HEADER ── */
+.hdr{
+  position:fixed;top:0;left:0;right:0;
+  display:flex;justify-content:space-between;align-items:center;
+  padding:env(safe-area-inset-top,0) 0 0;
+  background:#030f06;border-bottom:1px solid #0d2511;z-index:200;
+}
+.hdr-inner{
+  display:flex;justify-content:space-between;align-items:center;
+  width:100%;padding:12px 20px;
+}
+.hdr-title{font-size:10px;letter-spacing:2px;}
+.hdr-agent{color:#ff8c00;font-size:10px;letter-spacing:1px;max-width:130px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.hdr-logout{opacity:.35;font-size:9px;letter-spacing:1px;cursor:pointer;padding:4px 0;}
+
+/* ── MAIN SCREEN ── */
+#s-main{padding-top:50px;}
+.main-body{padding:20px;max-width:480px;width:100%;margin:0 auto;}
+
+.stats-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:22px;}
+.stat-card{background:rgba(77,255,110,.04);border:1px solid #0d2511;border-radius:3px;padding:14px 10px;text-align:center;}
+.stat-n{font-size:26px;font-weight:bold;line-height:1;}
+.stat-l{font-size:7px;letter-spacing:1.5px;opacity:.38;margin-top:4px;}
+
+.big-btn-wrap{margin-bottom:24px;}
+.big-btn{
+  width:100%;padding:28px 20px;text-align:center;
+  background:rgba(77,255,110,.06);border:1px solid rgba(77,255,110,.25);
+  color:#4dff6e;font-family:'Courier New',monospace;font-size:12px;
+  font-weight:bold;letter-spacing:3px;cursor:pointer;border-radius:4px;
+}
+.big-btn:active{background:rgba(77,255,110,.14);}
+.big-btn-icon{font-size:32px;display:block;margin-bottom:8px;}
+
+.feed-header{font-size:8px;letter-spacing:2px;opacity:.35;padding-bottom:10px;border-bottom:1px solid #0d2511;margin-bottom:0;}
+.feed-item{
+  display:flex;align-items:center;gap:10px;
+  padding:11px 0;border-bottom:1px solid rgba(13,37,17,.7);
+}
+.feed-tipo{
+  background:rgba(77,255,110,.08);border:1px solid rgba(77,255,110,.15);
+  padding:4px 8px;border-radius:2px;font-size:8px;letter-spacing:1px;
+  white-space:nowrap;
+}
+.feed-interesse{font-size:9px;letter-spacing:1px;flex:1;}
+.feed-hora{opacity:.32;font-size:9px;white-space:nowrap;}
+.feed-empty{opacity:.28;font-size:10px;letter-spacing:1px;text-align:center;padding:30px 0;}
+
+/* ── FORM SCREEN ── */
+#s-form{padding-top:50px;overflow-y:auto;}
+.form-body{padding:20px 20px 120px;max-width:480px;width:100%;margin:0 auto;}
+.gps-pill{
+  display:inline-flex;align-items:center;gap:6px;
+  padding:5px 12px;border-radius:20px;font-size:8px;letter-spacing:1.5px;margin-bottom:22px;
+}
+.gps-ok{background:rgba(77,255,110,.1);color:rgba(77,255,110,.75);border:1px solid rgba(77,255,110,.2);}
+.gps-wait{background:rgba(255,140,0,.1);color:rgba(255,140,0,.75);border:1px solid rgba(255,140,0,.2);}
+.gps-err{background:rgba(255,60,60,.1);color:rgba(255,60,60,.75);border:1px solid rgba(255,60,60,.2);}
+
+.fsec{margin-bottom:28px;}
+.fsec-title{font-size:8px;letter-spacing:2.5px;opacity:.4;text-transform:uppercase;margin-bottom:12px;}
+.opts{display:flex;flex-wrap:wrap;gap:8px;}
+.opt{
+  flex:1;min-width:calc(50% - 4px);padding:14px 8px;text-align:center;
+  background:transparent;border:1px solid #0d2511;
+  color:rgba(77,255,110,.42);font-family:'Courier New',monospace;
+  font-size:10px;letter-spacing:1.5px;cursor:pointer;border-radius:2px;
+  transition:all .12s;
+}
+.opt3{min-width:calc(33.3% - 6px);}
+.opt.sel{background:rgba(77,255,110,.1);border-color:rgba(77,255,110,.55);color:#4dff6e;}
+.opt:active{opacity:.7;}
+
+textarea{
+  width:100%;background:transparent;border:1px solid #0d2511;border-radius:2px;
+  color:#4dff6e;font-family:'Courier New',monospace;font-size:14px;
+  padding:13px;min-height:90px;outline:none;resize:none;
+  letter-spacing:.5px;line-height:1.7;
+}
+textarea:focus{border-color:rgba(77,255,110,.3);}
+textarea::placeholder{color:rgba(77,255,110,.22);font-size:11px;letter-spacing:1px;}
+
+.form-footer{
+  position:fixed;bottom:0;left:0;right:0;
+  padding:12px 20px;padding-bottom:calc(12px + env(safe-area-inset-bottom,0));
+  background:#030f06;border-top:1px solid #0d2511;
+}
+.form-footer-inner{max-width:480px;margin:0 auto;}
+
+/* ── SUCCESS ── */
+#s-success{align-items:center;justify-content:center;padding:40px 28px;}
+.check-circle{
+  width:80px;height:80px;border-radius:50%;
+  border:2px solid #4dff6e;
+  display:flex;align-items:center;justify-content:center;
+  font-size:36px;margin-bottom:24px;
+  animation:pop .4s cubic-bezier(.36,.07,.19,.97);
+}
+@keyframes pop{0%{transform:scale(0);}70%{transform:scale(1.15);}100%{transform:scale(1);}}
+.suc-title{font-size:14px;letter-spacing:3px;margin-bottom:8px;text-align:center;}
+.suc-sub{font-size:9px;letter-spacing:2px;opacity:.38;margin-bottom:8px;text-align:center;}
+.suc-coords{font-size:8px;opacity:.25;margin-bottom:36px;text-align:center;letter-spacing:1px;}
+
+/* ── MISC ── */
+.err-msg{color:#ff4444;font-size:10px;letter-spacing:1px;text-align:center;min-height:18px;margin-bottom:8px;}
+.spin{display:inline-block;animation:rotate 1s linear infinite;}
+@keyframes rotate{to{transform:rotate(360deg);}}
+</style>
+</head>
+<body>
+
+<!-- ════ LOGIN ════ -->
+<div id="s-login" class="screen active">
+  <div class="logo">▣ C.I.T.</div>
+  <div class="logo-sub">AGENTE · ONDA DEFESA DE TERRITÓRIO</div>
+  <input type="email" id="l-email" placeholder="SEU EMAIL" autocomplete="email" inputmode="email">
+  <input type="password" id="l-pass" placeholder="SENHA" autocomplete="current-password">
+  <div class="err-msg" id="l-err"></div>
+  <button class="btn" id="l-btn" onclick="doLogin()">ENTRAR</button>
+</div>
+
+<!-- ════ MAIN ════ -->
+<div id="s-main" class="screen">
+  <div class="hdr"><div class="hdr-inner">
+    <span class="hdr-title">▣ C.I.T.</span>
+    <span class="hdr-agent" id="m-name"></span>
+    <span class="hdr-logout" onclick="doLogout()">SAIR</span>
+  </div></div>
+  <div class="main-body">
+    <div class="stats-row">
+      <div class="stat-card"><div class="stat-n" id="m-hoje">0</div><div class="stat-l">HOJE</div></div>
+      <div class="stat-card"><div class="stat-n" id="m-total">0</div><div class="stat-l">TOTAL</div></div>
+      <div class="stat-card"><div class="stat-n" id="m-altos" style="color:#ff8c00;">0</div><div class="stat-l">ALTO INT.</div></div>
+    </div>
+    <div class="big-btn-wrap">
+      <button class="big-btn" onclick="showForm()">
+        <span class="big-btn-icon">＋</span>
+        NOVA ABORDAGEM
+      </button>
+    </div>
+    <div class="feed-header">ÚLTIMAS ABORDAGENS</div>
+    <div id="m-feed"></div>
+  </div>
+</div>
+
+<!-- ════ FORM ════ -->
+<div id="s-form" class="screen">
+  <div class="hdr"><div class="hdr-inner">
+    <span onclick="showMain()" style="cursor:pointer;opacity:.45;font-size:9px;letter-spacing:1px;">← VOLTAR</span>
+    <span style="font-size:10px;letter-spacing:2px;">NOVA ABORDAGEM</span>
+    <span id="f-gps" class="gps-pill gps-wait">⊙ LOCALIZANDO</span>
+  </div></div>
+  <div class="form-body">
+
+    <div class="fsec">
+      <div class="fsec-title">Tipo de Contato</div>
+      <div class="opts">
+        <button class="opt" data-field="tipo" data-val="ativo" onclick="sel(this)">ATIVO</button>
+        <button class="opt" data-field="tipo" data-val="digital" onclick="sel(this)">DIGITAL</button>
+        <button class="opt" data-field="tipo" data-val="indicacao" onclick="sel(this)">INDICAÇÃO</button>
+        <button class="opt" data-field="tipo" data-val="passivo" onclick="sel(this)">PASSIVO</button>
+      </div>
+    </div>
+
+    <div class="fsec">
+      <div class="fsec-title">Perfil do Lead</div>
+      <div class="opts">
+        <button class="opt opt3" data-field="perfil" data-val="mcmv" onclick="sel(this)">MCMV</button>
+        <button class="opt opt3" data-field="perfil" data-val="medio" onclick="sel(this)">MÉDIO</button>
+        <button class="opt opt3" data-field="perfil" data-val="alto" onclick="sel(this)">ALTO</button>
+      </div>
+    </div>
+
+    <div class="fsec">
+      <div class="fsec-title">Nível de Interesse</div>
+      <div class="opts">
+        <button class="opt opt3" data-field="interesse" data-val="alto" onclick="sel(this)">ALTO</button>
+        <button class="opt opt3" data-field="interesse" data-val="medio" onclick="sel(this)">MÉDIO</button>
+        <button class="opt opt3" data-field="interesse" data-val="baixo" onclick="sel(this)">BAIXO</button>
+      </div>
+    </div>
+
+    <div class="fsec">
+      <div class="fsec-title">Observação (opcional)</div>
+      <textarea id="f-obs" placeholder="Anote algo relevante sobre o lead..."></textarea>
+    </div>
+
+  </div>
+  <div class="form-footer"><div class="form-footer-inner">
+    <div class="err-msg" id="f-err"></div>
+    <button class="btn" id="f-btn" onclick="submitAbordagem()">REGISTRAR ABORDAGEM</button>
+  </div></div>
+</div>
+
+<!-- ════ SUCCESS ════ -->
+<div id="s-success" class="screen">
+  <div class="check-circle">✓</div>
+  <div class="suc-title">ABORDAGEM REGISTRADA</div>
+  <div class="suc-sub">DADOS ENVIADOS COM SUCESSO</div>
+  <div class="suc-coords" id="sc-coords"></div>
+  <button class="btn" onclick="showForm()" style="max-width:300px;">NOVA ABORDAGEM</button>
+  <button class="btn outline" onclick="showMain()" style="max-width:300px;">VER MEUS REGISTROS</button>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+const SUPA_URL = 'https://iaawdroypmeljrfuwawx.supabase.co';
+const SUPA_KEY = 'sb_publishable_Do90V25eFWYTb-UfSQLGRQ_I1LeN0XR';
+const sb = supabase.createClient(SUPA_URL, SUPA_KEY);
+
+let user = null, agente = null, gps = null, watchId = null;
+const form = { tipo: null, perfil: null, interesse: null };
+
+// ── SCREENS ──
+function show(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  const el = document.getElementById(id);
+  if (el) el.classList.add('active');
+  window.scrollTo(0, 0);
+}
+
+// ── AUTH ──
+async function doLogin() {
+  const email = document.getElementById('l-email').value.trim();
+  const pass = document.getElementById('l-pass').value;
+  const btn = document.getElementById('l-btn');
+  const err = document.getElementById('l-err');
+  if (!email || !pass) { err.textContent = 'PREENCHA EMAIL E SENHA'; return; }
+  btn.innerHTML = '<span class="spin">◌</span>';
+  btn.disabled = true;
+  err.textContent = '';
+  const { data, error } = await sb.auth.signInWithPassword({ email, password: pass });
+  if (error) {
+    err.textContent = 'EMAIL OU SENHA INCORRETOS';
+    btn.textContent = 'ENTRAR';
+    btn.disabled = false;
+    return;
+  }
+  user = data.user;
+  await loadAgente();
+  show('s-main');
+  startGPS();
+  await loadStats();
+  await loadFeed();
+}
+
+async function loadAgente() {
+  const { data } = await sb.from('agentes').select('*').eq('user_id', user.id).maybeSingle();
+  if (data) {
+    agente = data;
+  } else {
+    const nome = (user.user_metadata?.nome) || user.email.split('@')[0];
+    const { data: novo } = await sb.from('agentes').insert({ user_id: user.id, nome }).select().maybeSingle();
+    agente = novo;
+  }
+  if (agente) {
+    document.getElementById('m-name').textContent = agente.nome.toUpperCase();
+  }
+}
+
+function doLogout() {
+  sb.auth.signOut();
+  user = null; agente = null; gps = null;
+  if (watchId) navigator.geolocation.clearWatch(watchId);
+  show('s-login');
+}
+
+// ── GPS ──
+function startGPS() {
+  if (!navigator.geolocation) return;
+  if (watchId) navigator.geolocation.clearWatch(watchId);
+  watchId = navigator.geolocation.watchPosition(
+    pos => {
+      gps = { lat: pos.coords.latitude, lng: pos.coords.longitude, acc: Math.round(pos.coords.accuracy) };
+      const el = document.getElementById('f-gps');
+      if (el) { el.textContent = `⊙ GPS ±${gps.acc}m`; el.className = 'gps-pill gps-ok'; }
+    },
+    () => {
+      const el = document.getElementById('f-gps');
+      if (el) { el.textContent = '⊙ SEM GPS'; el.className = 'gps-pill gps-err'; }
+    },
+    { enableHighAccuracy: true, maximumAge: 8000, timeout: 20000 }
+  );
+}
+
+// ── STATS ──
+async function loadStats() {
+  if (!agente) return;
+  const { data } = await sb.from('abordagens').select('id,interesse,created_at').eq('agente_id', agente.id);
+  if (!data) return;
+  const hoje = new Date().toISOString().split('T')[0];
+  document.getElementById('m-hoje').textContent = data.filter(a => a.created_at.startsWith(hoje)).length;
+  document.getElementById('m-total').textContent = data.length;
+  document.getElementById('m-altos').textContent = data.filter(a => a.interesse === 'alto').length;
+}
+
+async function loadFeed() {
+  if (!agente) return;
+  const { data } = await sb.from('abordagens')
+    .select('tipo_contato,interesse,created_at')
+    .eq('agente_id', agente.id)
+    .order('created_at', { ascending: false })
+    .limit(10);
+  const feed = document.getElementById('m-feed');
+  if (!data || !data.length) {
+    feed.innerHTML = '<div class="feed-empty">Nenhuma abordagem registrada ainda</div>';
+    return;
+  }
+  const cores = { alto: '#ff8c00', medio: '#4dff6e', baixo: 'rgba(77,255,110,.38)' };
+  feed.innerHTML = data.map(a => {
+    const hora = new Date(a.created_at).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+    const cor = cores[a.interesse] || '#4dff6e';
+    return `<div class="feed-item">
+      <span class="feed-tipo">${(a.tipo_contato || '–').toUpperCase()}</span>
+      <span class="feed-interesse" style="color:${cor}">${(a.interesse || '–').toUpperCase()}</span>
+      <span class="feed-hora">${hora}</span>
+    </div>`;
+  }).join('');
+}
+
+// ── NAVIGATION ──
+function showForm() {
+  form.tipo = null; form.perfil = null; form.interesse = null;
+  document.getElementById('f-obs').value = '';
+  document.getElementById('f-err').textContent = '';
+  document.getElementById('f-btn').textContent = 'REGISTRAR ABORDAGEM';
+  document.getElementById('f-btn').disabled = false;
+  document.querySelectorAll('.opt').forEach(o => o.classList.remove('sel'));
+  const gpsEl = document.getElementById('f-gps');
+  if (gps) {
+    gpsEl.textContent = `⊙ GPS ±${gps.acc}m`; gpsEl.className = 'gps-pill gps-ok';
+  } else {
+    gpsEl.textContent = '⊙ LOCALIZANDO'; gpsEl.className = 'gps-pill gps-wait';
+  }
+  startGPS();
+  show('s-form');
+}
+
+function showMain() {
+  loadStats();
+  loadFeed();
+  show('s-main');
+}
+
+// ── FORM ──
+function sel(el) {
+  const field = el.dataset.field;
+  document.querySelectorAll(`.opt[data-field="${field}"]`).forEach(o => o.classList.remove('sel'));
+  el.classList.add('sel');
+  form[field] = el.dataset.val;
+}
+
+async function submitAbordagem() {
+  const err = document.getElementById('f-err');
+  const btn = document.getElementById('f-btn');
+  if (!form.tipo) { err.textContent = 'SELECIONE O TIPO DE CONTATO'; return; }
+  if (!form.perfil) { err.textContent = 'SELECIONE O PERFIL DO LEAD'; return; }
+  if (!form.interesse) { err.textContent = 'SELECIONE O NÍVEL DE INTERESSE'; return; }
+  if (!gps) { err.textContent = 'AGUARDANDO SINAL DE GPS...'; return; }
+  if (!agente) { err.textContent = 'ERRO: AGENTE NÃO IDENTIFICADO'; return; }
+  btn.innerHTML = '<span class="spin">◌</span> ENVIANDO...';
+  btn.disabled = true;
+  err.textContent = '';
+  const { error } = await sb.from('abordagens').insert({
+    agente_id: agente.id,
+    empreendimento_id: agente.empreendimento_id || null,
+    latitude: gps.lat,
+    longitude: gps.lng,
+    tipo_contato: form.tipo,
+    perfil_lead: form.perfil,
+    interesse: form.interesse,
+    observacao: document.getElementById('f-obs').value.trim() || null
+  });
+  if (error) {
+    err.textContent = 'ERRO AO ENVIAR. TENTE NOVAMENTE.';
+    btn.textContent = 'REGISTRAR ABORDAGEM';
+    btn.disabled = false;
+    return;
+  }
+  document.getElementById('sc-coords').textContent =
+    `${gps.lat.toFixed(5)}, ${gps.lng.toFixed(5)} · ±${gps.acc}m`;
+  show('s-success');
+}
+
+// ── SESSION RESTORE ──
+sb.auth.onAuthStateChange(async (event, session) => {
+  if (session?.user && !user) {
+    user = session.user;
+    await loadAgente();
+    show('s-main');
+    startGPS();
+    loadStats();
+    loadFeed();
+  }
+});
+</script>
+</body>
+</html>
