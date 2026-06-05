@@ -11,135 +11,111 @@
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
 html,body{height:100%;background:#0D1208;color:#F0F2EC;font-family:'Montserrat',Arial,sans-serif;overflow-x:hidden;}
-
 .screen{display:none;flex-direction:column;min-height:100vh;}
 .screen.active{display:flex;}
 
-/* ── LOGIN ── */
 #s-login{align-items:center;justify-content:center;padding:40px 28px;}
 .logo{font-family:'Bebas Neue',Oswald,sans-serif;font-size:38px;letter-spacing:5px;color:#C4A040;margin-bottom:4px;text-align:center;}
-.logo-sub{font-family:'Montserrat',Arial,sans-serif;font-size:9px;letter-spacing:3px;color:#F0F2EC;opacity:.5;margin-bottom:52px;text-align:center;}
+.logo-sub{font-size:9px;letter-spacing:3px;color:#F0F2EC;opacity:.5;margin-bottom:52px;text-align:center;}
 
-input[type=email],input[type=password]{
-  display:block;width:100%;max-width:340px;
-  background:transparent;border:none;border-bottom:1px solid #3D5926;
-  color:#F0F2EC;font-family:'Montserrat',Arial,sans-serif;font-size:15px;
-  padding:14px 4px;margin-bottom:20px;outline:none;letter-spacing:1px;
-}
+input[type=email],input[type=password]{display:block;width:100%;max-width:340px;background:transparent;border:none;border-bottom:1px solid #3D5926;color:#F0F2EC;font-family:'Montserrat',Arial,sans-serif;font-size:15px;padding:14px 4px;margin-bottom:20px;outline:none;letter-spacing:1px;}
 input::placeholder{color:rgba(240,242,236,.35);font-size:11px;letter-spacing:2px;}
 
-/* ── BUTTONS ── */
-.btn{
-  display:block;width:100%;max-width:340px;
-  background:#C4A040;color:#0D1208;
-  font-family:'Bebas Neue',Oswald,sans-serif;font-size:14px;
-  letter-spacing:3px;padding:17px;border:none;cursor:pointer;border-radius:2px;margin-top:6px;
-  transition:opacity .15s;
-}
+.btn{display:block;width:100%;max-width:340px;background:#C4A040;color:#0D1208;font-family:'Bebas Neue',Oswald,sans-serif;font-size:14px;letter-spacing:3px;padding:17px;border:none;cursor:pointer;border-radius:2px;margin-top:6px;transition:opacity .15s;}
 .btn:active{opacity:.8;}
 .btn.outline{background:transparent;color:#C4A040;border:1px solid #C4A040;margin-top:10px;}
 .btn:disabled{opacity:.4;cursor:not-allowed;}
 
-/* ── HEADER ── */
-.hdr{
-  position:fixed;top:0;left:0;right:0;
-  display:flex;justify-content:space-between;align-items:center;
-  padding:env(safe-area-inset-top,0) 0 0;
-  background:#0D1208;border-bottom:1px solid #3D5926;z-index:200;
-}
+.hdr{position:fixed;top:0;left:0;right:0;display:flex;justify-content:space-between;align-items:center;padding:env(safe-area-inset-top,0) 0 0;background:#0D1208;border-bottom:1px solid #3D5926;z-index:200;}
 .hdr-inner{display:flex;justify-content:space-between;align-items:center;width:100%;padding:12px 20px;}
 .hdr-title{font-family:'Bebas Neue',Oswald,sans-serif;font-size:14px;letter-spacing:3px;color:#C4A040;}
-.hdr-agent{color:#F0F2EC;font-size:10px;letter-spacing:1px;max-width:130px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-family:'Montserrat',Arial,sans-serif;}
-.hdr-logout{color:#F0F2EC;opacity:.4;font-size:9px;letter-spacing:1px;cursor:pointer;padding:4px 0;font-family:'Montserrat',Arial,sans-serif;}
+.hdr-agent{color:#F0F2EC;font-size:10px;letter-spacing:1px;max-width:130px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.hdr-logout{color:#F0F2EC;opacity:.4;font-size:9px;letter-spacing:1px;cursor:pointer;padding:4px 0;}
 
-/* ── MAIN ── */
 #s-main{padding-top:50px;}
 .main-body{padding:20px;max-width:480px;width:100%;margin:0 auto;}
-
 .stats-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:22px;}
 .stat-card{background:rgba(61,89,38,.15);border:1px solid #3D5926;border-radius:3px;padding:14px 10px;text-align:center;}
 .stat-n{font-family:'Bebas Neue',Oswald,sans-serif;font-size:30px;color:#C4A040;line-height:1;}
-.stat-l{font-size:7px;letter-spacing:1.5px;color:#F0F2EC;opacity:.5;margin-top:4px;font-family:'Montserrat',Arial,sans-serif;}
-
+.stat-l{font-size:7px;letter-spacing:1.5px;color:#F0F2EC;opacity:.5;margin-top:4px;}
 .big-btn-wrap{margin-bottom:24px;}
-.big-btn{
-  width:100%;padding:28px 20px;text-align:center;
-  background:rgba(61,89,38,.2);border:1px solid #3D5926;
-  color:#F0F2EC;font-family:'Bebas Neue',Oswald,sans-serif;font-size:16px;
-  letter-spacing:4px;cursor:pointer;border-radius:4px;
-  transition:background .15s;
-}
+.big-btn{width:100%;padding:28px 20px;text-align:center;background:rgba(61,89,38,.2);border:1px solid #3D5926;color:#F0F2EC;font-family:'Bebas Neue',Oswald,sans-serif;font-size:16px;letter-spacing:4px;cursor:pointer;border-radius:4px;}
 .big-btn:active{background:rgba(61,89,38,.4);}
 .big-btn-icon{font-size:32px;display:block;margin-bottom:8px;color:#C4A040;}
-
-.feed-header{font-family:'Montserrat',Arial,sans-serif;font-size:8px;letter-spacing:2px;color:#F0F2EC;opacity:.4;padding-bottom:10px;border-bottom:1px solid #3D5926;margin-bottom:0;}
+.feed-header{font-size:8px;letter-spacing:2px;color:#F0F2EC;opacity:.4;padding-bottom:10px;border-bottom:1px solid #3D5926;margin-bottom:0;}
 .feed-item{display:flex;align-items:center;gap:10px;padding:11px 0;border-bottom:1px solid rgba(61,89,38,.5);}
-.feed-tipo{background:rgba(61,89,38,.25);border:1px solid #3D5926;padding:4px 8px;border-radius:2px;font-size:8px;letter-spacing:1px;white-space:nowrap;color:#F0F2EC;font-family:'Montserrat',Arial,sans-serif;}
-.feed-interesse{font-size:9px;letter-spacing:1px;flex:1;font-family:'Montserrat',Arial,sans-serif;}
-.feed-hora{color:#F0F2EC;opacity:.4;font-size:9px;white-space:nowrap;font-family:'Montserrat',Arial,sans-serif;}
-.feed-empty{color:#F0F2EC;opacity:.35;font-size:10px;letter-spacing:1px;text-align:center;padding:30px 0;font-family:'Montserrat',Arial,sans-serif;}
+.feed-tipo{background:rgba(61,89,38,.25);border:1px solid #3D5926;padding:4px 8px;border-radius:2px;font-size:8px;letter-spacing:1px;white-space:nowrap;color:#F0F2EC;}
+.feed-interesse{font-size:9px;letter-spacing:1px;flex:1;}
+.feed-lead{font-size:9px;color:#F0F2EC;opacity:.6;flex:2;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.feed-hora{color:#F0F2EC;opacity:.4;font-size:9px;white-space:nowrap;}
+.feed-empty{color:#F0F2EC;opacity:.35;font-size:10px;letter-spacing:1px;text-align:center;padding:30px 0;}
 
-/* ── FORM ── */
 #s-form{padding-top:50px;overflow-y:auto;}
 .form-body{padding:20px 20px 120px;max-width:480px;width:100%;margin:0 auto;}
 
-.gps-pill{display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border-radius:20px;font-size:8px;letter-spacing:1.5px;font-family:'Montserrat',Arial,sans-serif;}
+.gps-pill{display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border-radius:20px;font-size:8px;letter-spacing:1.5px;}
 .gps-ok{background:rgba(61,89,38,.3);color:#F0F2EC;border:1px solid #3D5926;}
 .gps-wait{background:rgba(196,160,64,.15);color:#C4A040;border:1px solid rgba(196,160,64,.4);}
 .gps-err{background:rgba(255,60,60,.1);color:rgba(255,100,100,.9);border:1px solid rgba(255,60,60,.3);}
 
 .fsec{margin-bottom:28px;}
-.fsec-title{font-family:'Montserrat',Arial,sans-serif;font-size:9px;font-weight:600;letter-spacing:2.5px;color:#C4A040;text-transform:uppercase;margin-bottom:12px;}
+.fsec-title{font-size:9px;font-weight:600;letter-spacing:2.5px;color:#C4A040;text-transform:uppercase;margin-bottom:12px;}
+.fsec-hint{font-size:8px;letter-spacing:1px;color:#F0F2EC;opacity:.4;margin-top:6px;}
+.fsec-hint.obrig{color:#C4A040;opacity:.7;}
 
 .opts{display:flex;flex-wrap:wrap;gap:8px;}
-.opt{
-  flex:1;min-width:calc(50% - 4px);padding:16px 8px;text-align:center;
-  background:rgba(61,89,38,.1);border:1px solid #3D5926;
-  color:#F0F2EC;font-family:'Montserrat',Arial,sans-serif;
-  font-size:11px;font-weight:600;letter-spacing:1.5px;cursor:pointer;border-radius:2px;
-  transition:all .12s;
-}
+.opt{flex:1;min-width:calc(50% - 4px);padding:16px 8px;text-align:center;background:rgba(61,89,38,.1);border:1px solid #3D5926;color:#F0F2EC;font-family:'Montserrat',Arial,sans-serif;font-size:11px;font-weight:600;letter-spacing:1.5px;cursor:pointer;border-radius:2px;transition:all .12s;}
 .opt3{min-width:calc(33.3% - 6px);}
 .opt.sel{background:#2E4218;border-color:#C4A040;color:#C4A040;}
 .opt:active{opacity:.7;}
 
-textarea{
+/* ── CAMPOS DE LEAD ── */
+.lead-fields{display:flex;flex-direction:column;gap:14px;}
+.field-wrap{position:relative;}
+.field-label{font-size:8px;letter-spacing:2px;color:#C4A040;opacity:.8;margin-bottom:6px;display:block;}
+.field-label span{color:#F0F2EC;opacity:.4;font-size:7px;margin-left:4px;}
+.field-input{
   width:100%;background:rgba(61,89,38,.1);border:1px solid #3D5926;border-radius:2px;
   color:#F0F2EC;font-family:'Montserrat',Arial,sans-serif;font-size:14px;
-  padding:13px;min-height:90px;outline:none;resize:none;
-  letter-spacing:.5px;line-height:1.7;
+  padding:13px;outline:none;letter-spacing:.5px;
+  transition:border-color .2s;
 }
+.field-input:focus{border-color:#C4A040;}
+.field-input::placeholder{color:rgba(240,242,236,.3);font-size:11px;letter-spacing:1px;}
+.field-input.erro{border-color:#ff6b6b;}
+.field-input:disabled{opacity:.3;cursor:not-allowed;}
+
+.campo-status{
+  font-size:8px;letter-spacing:1px;margin-top:5px;min-height:14px;
+  display:flex;align-items:center;gap:4px;
+}
+.campo-status.ok{color:#C4A040;}
+.campo-status.err{color:#ff6b6b;}
+.campo-status.info{color:#F0F2EC;opacity:.4;}
+
+textarea{width:100%;background:rgba(61,89,38,.1);border:1px solid #3D5926;border-radius:2px;color:#F0F2EC;font-family:'Montserrat',Arial,sans-serif;font-size:14px;padding:13px;min-height:90px;outline:none;resize:none;letter-spacing:.5px;line-height:1.7;}
 textarea:focus{border-color:#C4A040;}
 textarea::placeholder{color:rgba(240,242,236,.3);font-size:11px;letter-spacing:1px;}
 
-.form-footer{
-  position:fixed;bottom:0;left:0;right:0;
-  padding:12px 20px;padding-bottom:calc(12px + env(safe-area-inset-bottom,0));
-  background:#0D1208;border-top:1px solid #3D5926;
-}
+.regua-box{background:rgba(196,160,64,.07);border:1px solid rgba(196,160,64,.2);border-radius:3px;padding:10px 14px;margin-bottom:20px;font-size:8px;letter-spacing:1px;color:#C4A040;line-height:1.8;display:none;}
+.regua-box.show{display:block;}
+
+.form-footer{position:fixed;bottom:0;left:0;right:0;padding:12px 20px;padding-bottom:calc(12px + env(safe-area-inset-bottom,0));background:#0D1208;border-top:1px solid #3D5926;}
 .form-footer-inner{max-width:480px;margin:0 auto;}
 
-/* ── SUCCESS ── */
 #s-success{align-items:center;justify-content:center;padding:40px 28px;}
-.check-circle{
-  width:80px;height:80px;border-radius:50%;
-  border:2px solid #C4A040;
-  display:flex;align-items:center;justify-content:center;
-  font-size:36px;color:#C4A040;margin-bottom:24px;
-  animation:pop .4s cubic-bezier(.36,.07,.19,.97);
-}
+.check-circle{width:80px;height:80px;border-radius:50%;border:2px solid #C4A040;display:flex;align-items:center;justify-content:center;font-size:36px;color:#C4A040;margin-bottom:24px;animation:pop .4s cubic-bezier(.36,.07,.19,.97);}
 @keyframes pop{0%{transform:scale(0);}70%{transform:scale(1.15);}100%{transform:scale(1);}}
 .suc-title{font-family:'Bebas Neue',Oswald,sans-serif;font-size:20px;letter-spacing:4px;color:#C4A040;margin-bottom:8px;text-align:center;}
-.suc-sub{font-size:9px;letter-spacing:2px;color:#F0F2EC;opacity:.5;margin-bottom:8px;text-align:center;font-family:'Montserrat',Arial,sans-serif;}
-.suc-coords{font-size:8px;color:#F0F2EC;opacity:.3;margin-bottom:36px;text-align:center;letter-spacing:1px;font-family:'Montserrat',Arial,sans-serif;}
+.suc-sub{font-size:9px;letter-spacing:2px;color:#F0F2EC;opacity:.5;margin-bottom:8px;text-align:center;}
+.suc-lead{font-size:11px;color:#F0F2EC;margin-bottom:4px;text-align:center;letter-spacing:1px;}
+.suc-coords{font-size:8px;color:#F0F2EC;opacity:.3;margin-bottom:36px;text-align:center;letter-spacing:1px;}
 
-/* ── MISC ── */
-.err-msg{color:#ff6b6b;font-size:10px;letter-spacing:1px;text-align:center;min-height:18px;margin-bottom:8px;font-family:'Montserrat',Arial,sans-serif;}
+.err-msg{color:#ff6b6b;font-size:10px;letter-spacing:1px;text-align:center;min-height:18px;margin-bottom:8px;}
 .spin{display:inline-block;animation:rotate 1s linear infinite;}
 @keyframes rotate{to{transform:rotate(360deg);}}
-
 #s-loading{align-items:center;justify-content:center;}
-.loading-txt{font-family:'Montserrat',Arial,sans-serif;font-size:10px;letter-spacing:3px;color:#F0F2EC;opacity:.4;animation:blink 1.2s ease-in-out infinite;}
+.loading-txt{font-size:10px;letter-spacing:3px;color:#F0F2EC;opacity:.4;animation:blink 1.2s ease-in-out infinite;}
 @keyframes blink{0%,100%{opacity:.4;}50%{opacity:.9;}}
 </style>
 </head>
@@ -187,11 +163,12 @@ textarea::placeholder{color:rgba(240,242,236,.3);font-size:11px;letter-spacing:1
 <!-- FORM -->
 <div id="s-form" class="screen">
   <div class="hdr"><div class="hdr-inner">
-    <span onclick="showMain()" style="cursor:pointer;color:#F0F2EC;opacity:.5;font-size:9px;letter-spacing:1px;font-family:'Montserrat',Arial,sans-serif;">← VOLTAR</span>
+    <span onclick="showMain()" style="cursor:pointer;color:#F0F2EC;opacity:.5;font-size:9px;letter-spacing:1px;">← VOLTAR</span>
     <span style="font-family:'Bebas Neue',Oswald,sans-serif;font-size:14px;letter-spacing:3px;color:#C4A040;">NOVA ABORDAGEM</span>
     <span id="f-gps" class="gps-pill gps-wait">⊙ LOCALIZANDO</span>
   </div></div>
   <div class="form-body">
+
     <div class="fsec">
       <div class="fsec-title">Tipo de Contato</div>
       <div class="opts">
@@ -201,6 +178,7 @@ textarea::placeholder{color:rgba(240,242,236,.3);font-size:11px;letter-spacing:1
         <button class="opt" data-field="tipo" data-val="passivo" onclick="sel(this)">PASSIVO</button>
       </div>
     </div>
+
     <div class="fsec">
       <div class="fsec-title">Perfil do Lead</div>
       <div class="opts">
@@ -209,6 +187,7 @@ textarea::placeholder{color:rgba(240,242,236,.3);font-size:11px;letter-spacing:1
         <button class="opt opt3" data-field="perfil" data-val="alto" onclick="sel(this)">ALTO</button>
       </div>
     </div>
+
     <div class="fsec">
       <div class="fsec-title">Nível de Interesse</div>
       <div class="opts">
@@ -217,10 +196,32 @@ textarea::placeholder{color:rgba(240,242,236,.3);font-size:11px;letter-spacing:1
         <button class="opt opt3" data-field="interesse" data-val="baixo" onclick="sel(this)">BAIXO</button>
       </div>
     </div>
+
+    <!-- DADOS DO LEAD -->
     <div class="fsec">
-      <div class="fsec-title">Observação (opcional)</div>
+      <div class="fsec-title">Dados do Lead</div>
+      <div id="regua-info" class="regua-box show">
+        ▸ Selecione o nível de interesse para ver os campos obrigatórios
+      </div>
+      <div class="lead-fields">
+        <div class="field-wrap">
+          <label class="field-label">NOME COMPLETO <span>OBRIGATÓRIO</span></label>
+          <input class="field-input" id="f-nome" type="text" placeholder="Nome e sobrenome do lead" oninput="validarNome(this)" autocomplete="off">
+          <div class="campo-status info" id="st-nome">Mínimo nome e sobrenome</div>
+        </div>
+        <div class="field-wrap" id="wrap-tel">
+          <label class="field-label" id="label-tel">TELEFONE <span id="tel-obrig">OPCIONAL</span></label>
+          <input class="field-input" id="f-tel" type="tel" placeholder="(00) 00000-0000" oninput="mascaraTel(this)" autocomplete="off" inputmode="numeric">
+          <div class="campo-status info" id="st-tel">Com DDD</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="fsec">
+      <div class="fsec-title">Observação <span style="font-size:8px;opacity:.4;letter-spacing:1px;">(opcional)</span></div>
       <textarea id="f-obs" placeholder="Anote algo relevante sobre o lead..."></textarea>
     </div>
+
   </div>
   <div class="form-footer"><div class="form-footer-inner">
     <div class="err-msg" id="f-err"></div>
@@ -233,6 +234,7 @@ textarea::placeholder{color:rgba(240,242,236,.3);font-size:11px;letter-spacing:1
   <div class="check-circle">✓</div>
   <div class="suc-title">ABORDAGEM REGISTRADA</div>
   <div class="suc-sub">DADOS ENVIADOS COM SUCESSO</div>
+  <div class="suc-lead" id="sc-lead"></div>
   <div class="suc-coords" id="sc-coords"></div>
   <button class="btn" onclick="showForm()" style="max-width:300px;">NOVA ABORDAGEM</button>
   <button class="btn outline" onclick="showMain()" style="max-width:300px;">VER MEUS REGISTROS</button>
@@ -242,19 +244,109 @@ textarea::placeholder{color:rgba(240,242,236,.3);font-size:11px;letter-spacing:1
 <script>
 const SUPA_URL = 'https://iaawdroypmeljrfuwawx.supabase.co';
 const SUPA_KEY = 'sb_publishable_Do90V25eFWYTb-UfSQLGRQ_I1LeN0XR';
-
 const sb = supabase.createClient(SUPA_URL, SUPA_KEY, {
-  auth: {
-    persistSession: true,
-    autoRefreshToken: true,
-    detectSessionInUrl: false,
-    storage: window.localStorage
-  }
+  auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: false, storage: window.localStorage }
 });
 
 let user = null, agente = null, gps = null, watchId = null;
 const form = { tipo: null, perfil: null, interesse: null };
 
+// ── RÉGUA DE INTERESSE ──
+const REGUA = {
+  alto:  { telObrig: true,  msg: '▸ ALTO INTERESSE — Nome completo + Telefone obrigatórios' },
+  medio: { telObrig: true,  msg: '▸ MÉDIO INTERESSE — Nome completo + Telefone obrigatórios' },
+  baixo: { telObrig: false, msg: '▸ BAIXO INTERESSE — Nome completo obrigatório · Telefone opcional' }
+};
+
+function atualizarRegua(interesse) {
+  const info = document.getElementById('regua-info');
+  const telObrigEl = document.getElementById('tel-obrig');
+  const labelTel = document.getElementById('label-tel');
+  const stTel = document.getElementById('st-tel');
+  const telInput = document.getElementById('f-tel');
+
+  if (!interesse) {
+    info.textContent = '▸ Selecione o nível de interesse para ver os campos obrigatórios';
+    info.classList.add('show');
+    return;
+  }
+
+  const r = REGUA[interesse];
+  info.textContent = r.msg;
+  info.classList.add('show');
+
+  if (r.telObrig) {
+    telObrigEl.textContent = 'OBRIGATÓRIO';
+    telObrigEl.style.color = '#C4A040';
+    stTel.textContent = 'Obrigatório para este nível de interesse';
+    stTel.className = 'campo-status obrig';
+    telInput.placeholder = '(00) 00000-0000 — OBRIGATÓRIO';
+  } else {
+    telObrigEl.textContent = 'OPCIONAL';
+    telObrigEl.style.color = '';
+    stTel.textContent = 'Com DDD · opcional para baixo interesse';
+    stTel.className = 'campo-status info';
+    telInput.placeholder = '(00) 00000-0000';
+  }
+}
+
+// ── VALIDAÇÕES ──
+function validarNome(el) {
+  const val = el.value.trim();
+  const partes = val.split(/\s+/).filter(p => p.length > 0);
+  const st = document.getElementById('st-nome');
+  if (partes.length >= 2 && val.length >= 5) {
+    el.classList.remove('erro');
+    st.textContent = '✓ Nome válido';
+    st.className = 'campo-status ok';
+  } else if (val.length > 0) {
+    el.classList.add('erro');
+    st.textContent = 'Digite nome e sobrenome';
+    st.className = 'campo-status err';
+  } else {
+    el.classList.remove('erro');
+    st.textContent = 'Mínimo nome e sobrenome';
+    st.className = 'campo-status info';
+  }
+}
+
+function mascaraTel(el) {
+  let v = el.value.replace(/\D/g, '').slice(0, 11);
+  if (v.length >= 11) v = v.replace(/(\d{2})(\d{5})(\d{4})/, '($1) $2-$3');
+  else if (v.length >= 7) v = v.replace(/(\d{2})(\d{4,5})(\d{0,4})/, '($1) $2-$3');
+  else if (v.length >= 3) v = v.replace(/(\d{2})(\d+)/, '($1) $2');
+  else if (v.length > 0) v = '(' + v;
+  el.value = v;
+  const digits = el.value.replace(/\D/g, '');
+  const st = document.getElementById('st-tel');
+  if (digits.length >= 10) {
+    el.classList.remove('erro');
+    st.textContent = '✓ Telefone válido';
+    st.className = 'campo-status ok';
+  } else if (digits.length > 0) {
+    el.classList.add('erro');
+    st.textContent = 'Número incompleto';
+    st.className = 'campo-status err';
+  } else {
+    el.classList.remove('erro');
+    const r = REGUA[form.interesse];
+    st.textContent = r?.telObrig ? 'Obrigatório para este nível de interesse' : 'Com DDD · opcional para baixo interesse';
+    st.className = r?.telObrig ? 'campo-status obrig' : 'campo-status info';
+  }
+}
+
+function nomeValido() {
+  const val = document.getElementById('f-nome').value.trim();
+  const partes = val.split(/\s+/).filter(p => p.length > 0);
+  return partes.length >= 2 && val.length >= 5;
+}
+
+function telValido() {
+  const digits = document.getElementById('f-tel').value.replace(/\D/g, '');
+  return digits.length >= 10;
+}
+
+// ── SCREENS ──
 function show(id) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   const el = document.getElementById(id);
@@ -262,72 +354,48 @@ function show(id) {
   window.scrollTo(0, 0);
 }
 
+// ── INIT ──
 async function init() {
   try {
     const { data: { session }, error } = await sb.auth.getSession();
-    if (error || !session) {
-      await sb.auth.signOut();
-      show('s-login');
-      return;
-    }
+    if (error || !session) { await sb.auth.signOut(); show('s-login'); return; }
     user = session.user;
     await loadAgente();
-    show('s-main');
-    startGPS();
-    loadStats();
-    loadFeed();
-  } catch (e) {
-    show('s-login');
-  }
+    show('s-main'); startGPS(); loadStats(); loadFeed();
+  } catch (e) { show('s-login'); }
 }
 
+// ── AUTH ──
 async function doLogin() {
   const email = document.getElementById('l-email').value.trim();
   const pass = document.getElementById('l-pass').value;
   const btn = document.getElementById('l-btn');
   const err = document.getElementById('l-err');
   if (!email || !pass) { err.textContent = 'PREENCHA EMAIL E SENHA'; return; }
-  btn.innerHTML = '<span class="spin">◌</span>';
-  btn.disabled = true;
-  err.textContent = '';
+  btn.innerHTML = '<span class="spin">◌</span>'; btn.disabled = true; err.textContent = '';
   const { data, error } = await sb.auth.signInWithPassword({ email, password: pass });
-  if (error) {
-    err.textContent = 'EMAIL OU SENHA INCORRETOS';
-    btn.textContent = 'ENTRAR';
-    btn.disabled = false;
-    return;
-  }
+  if (error) { err.textContent = 'EMAIL OU SENHA INCORRETOS'; btn.textContent = 'ENTRAR'; btn.disabled = false; return; }
   user = data.user;
   await loadAgente();
-  show('s-main');
-  startGPS();
-  await loadStats();
-  await loadFeed();
+  show('s-main'); startGPS(); await loadStats(); await loadFeed();
 }
 
 async function loadAgente() {
   if (!user) return;
   const { data } = await sb.from('agentes').select('*').eq('user_id', user.id).maybeSingle();
-  if (data) {
-    agente = data;
-    document.getElementById('m-name').textContent = agente.nome.toUpperCase();
-    return;
-  }
+  if (data) { agente = data; document.getElementById('m-name').textContent = agente.nome.toUpperCase(); return; }
   const nome = user.user_metadata?.nome || user.user_metadata?.full_name || user.email.split('@')[0];
   const { data: novo } = await sb.from('agentes').insert({ user_id: user.id, nome }).select().maybeSingle();
-  if (novo) {
-    agente = novo;
-    document.getElementById('m-name').textContent = agente.nome.toUpperCase();
-  }
+  if (novo) { agente = novo; document.getElementById('m-name').textContent = agente.nome.toUpperCase(); }
 }
 
 function doLogout() {
-  sb.auth.signOut();
-  user = null; agente = null; gps = null;
+  sb.auth.signOut(); user = null; agente = null; gps = null;
   if (watchId) navigator.geolocation.clearWatch(watchId);
   show('s-login');
 }
 
+// ── GPS ──
 function startGPS() {
   if (!navigator.geolocation) return;
   if (watchId) navigator.geolocation.clearWatch(watchId);
@@ -337,14 +405,12 @@ function startGPS() {
       const el = document.getElementById('f-gps');
       if (el) { el.textContent = `⊙ GPS ±${gps.acc}m`; el.className = 'gps-pill gps-ok'; }
     },
-    () => {
-      const el = document.getElementById('f-gps');
-      if (el) { el.textContent = '⊙ SEM GPS'; el.className = 'gps-pill gps-err'; }
-    },
+    () => { const el = document.getElementById('f-gps'); if (el) { el.textContent = '⊙ SEM GPS'; el.className = 'gps-pill gps-err'; } },
     { enableHighAccuracy: true, maximumAge: 8000, timeout: 20000 }
   );
 }
 
+// ── STATS ──
 async function loadStats() {
   if (!agente) return;
   const { data } = await sb.from('abordagens').select('id,interesse,created_at').eq('agente_id', agente.id);
@@ -357,7 +423,7 @@ async function loadStats() {
 
 async function loadFeed() {
   if (!agente) return;
-  const { data } = await sb.from('abordagens').select('tipo_contato,interesse,created_at').eq('agente_id', agente.id).order('created_at', { ascending: false }).limit(10);
+  const { data } = await sb.from('abordagens').select('tipo_contato,interesse,created_at,nome_lead').eq('agente_id', agente.id).order('created_at', { ascending: false }).limit(10);
   const feed = document.getElementById('m-feed');
   if (!data || !data.length) { feed.innerHTML = '<div class="feed-empty">Nenhuma abordagem registrada ainda</div>'; return; }
   const cores = { alto: '#C4A040', medio: '#F0F2EC', baixo: 'rgba(240,242,236,.5)' };
@@ -366,24 +432,34 @@ async function loadFeed() {
     const cor = cores[a.interesse] || '#F0F2EC';
     return `<div class="feed-item">
       <span class="feed-tipo">${(a.tipo_contato || '–').toUpperCase()}</span>
+      <span class="feed-lead">${a.nome_lead || '–'}</span>
       <span class="feed-interesse" style="color:${cor}">${(a.interesse || '–').toUpperCase()}</span>
       <span class="feed-hora">${hora}</span>
     </div>`;
   }).join('');
 }
 
+// ── NAVIGATION ──
 function showForm() {
   form.tipo = null; form.perfil = null; form.interesse = null;
   document.getElementById('f-obs').value = '';
+  document.getElementById('f-nome').value = '';
+  document.getElementById('f-tel').value = '';
   document.getElementById('f-err').textContent = '';
   document.getElementById('f-btn').textContent = 'REGISTRAR ABORDAGEM';
   document.getElementById('f-btn').disabled = false;
+  document.getElementById('st-nome').textContent = 'Mínimo nome e sobrenome';
+  document.getElementById('st-nome').className = 'campo-status info';
+  document.getElementById('st-tel').textContent = 'Com DDD';
+  document.getElementById('st-tel').className = 'campo-status info';
+  document.getElementById('f-nome').classList.remove('erro');
+  document.getElementById('f-tel').classList.remove('erro');
   document.querySelectorAll('.opt').forEach(o => o.classList.remove('sel'));
+  atualizarRegua(null);
   const gpsEl = document.getElementById('f-gps');
   if (gps) { gpsEl.textContent = `⊙ GPS ±${gps.acc}m`; gpsEl.className = 'gps-pill gps-ok'; }
   else { gpsEl.textContent = '⊙ LOCALIZANDO'; gpsEl.className = 'gps-pill gps-wait'; }
-  startGPS();
-  show('s-form');
+  startGPS(); show('s-form');
 }
 
 function showMain() { loadStats(); loadFeed(); show('s-main'); }
@@ -393,33 +469,61 @@ function sel(el) {
   document.querySelectorAll(`.opt[data-field="${field}"]`).forEach(o => o.classList.remove('sel'));
   el.classList.add('sel');
   form[field] = el.dataset.val;
+  if (field === 'interesse') atualizarRegua(form.interesse);
 }
 
+// ── SUBMIT ──
 async function submitAbordagem() {
   const err = document.getElementById('f-err');
   const btn = document.getElementById('f-btn');
+
   if (!form.tipo)      { err.textContent = 'SELECIONE O TIPO DE CONTATO'; return; }
   if (!form.perfil)    { err.textContent = 'SELECIONE O PERFIL DO LEAD'; return; }
   if (!form.interesse) { err.textContent = 'SELECIONE O NÍVEL DE INTERESSE'; return; }
   if (!gps)            { err.textContent = 'AGUARDANDO SINAL DE GPS...'; return; }
+
+  // Validação de nome
+  if (!nomeValido()) {
+    err.textContent = 'INFORME O NOME COMPLETO DO LEAD (nome e sobrenome)';
+    document.getElementById('f-nome').classList.add('erro');
+    document.getElementById('f-nome').focus();
+    return;
+  }
+
+  // Validação de telefone pela régua
+  const r = REGUA[form.interesse];
+  if (r.telObrig && !telValido()) {
+    err.textContent = `TELEFONE OBRIGATÓRIO PARA INTERESSE ${form.interesse.toUpperCase()}`;
+    document.getElementById('f-tel').classList.add('erro');
+    document.getElementById('f-tel').focus();
+    return;
+  }
+
   if (!agente) { err.textContent = '⊙ IDENTIFICANDO AGENTE...'; await loadAgente(); }
   if (!agente) { err.textContent = 'ERRO: AGENTE NÃO IDENTIFICADO — SAIA E ENTRE NOVAMENTE'; return; }
-  btn.innerHTML = '<span class="spin">◌</span> ENVIANDO...';
-  btn.disabled = true;
-  err.textContent = '';
+
+  btn.innerHTML = '<span class="spin">◌</span> ENVIANDO...'; btn.disabled = true; err.textContent = '';
+
+  const nomeLead = document.getElementById('f-nome').value.trim();
+  const telLead = document.getElementById('f-tel').value.trim() || null;
+
   const { error } = await sb.from('abordagens').insert({
     agente_id: agente.id,
     empreendimento_id: agente.empreendimento_id || null,
     latitude: gps.lat, longitude: gps.lng,
     tipo_contato: form.tipo, perfil_lead: form.perfil, interesse: form.interesse,
+    nome_lead: nomeLead,
+    telefone_lead: telLead,
     observacao: document.getElementById('f-obs').value.trim() || null
   });
+
   if (error) {
     err.textContent = `ERRO: ${error.message || 'TENTE NOVAMENTE'}`;
-    btn.textContent = 'REGISTRAR ABORDAGEM';
-    btn.disabled = false;
+    btn.textContent = 'REGISTRAR ABORDAGEM'; btn.disabled = false;
     return;
   }
+
+  document.getElementById('sc-lead').textContent = nomeLead + (telLead ? ` · ${telLead}` : '');
   document.getElementById('sc-coords').textContent = `${gps.lat.toFixed(5)}, ${gps.lng.toFixed(5)} · ±${gps.acc}m`;
   show('s-success');
 }
