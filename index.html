@@ -105,7 +105,7 @@ input::placeholder{color:rgba(77,255,110,.28);font-size:11px;letter-spacing:2px;
     <span class="dash-ops">● ONDA</span>
     <span class="dash-clk" id="clk">--:--:--</span>
   </div>
-  <div class="side-panel" id="side">
+  <div class="side-panel">
     <div class="sp-section">
       <div class="sp-title">Métricas Gerais</div>
       <div class="metric-grid">
@@ -117,7 +117,7 @@ input::placeholder{color:rgba(77,255,110,.28);font-size:11px;letter-spacing:2px;
     </div>
     <div class="sp-section"><div class="sp-title">Por Interesse</div><div id="sp-interesse-bars"></div></div>
     <div class="sp-section"><div class="sp-title">Por Tipo de Contato</div><div id="sp-tipo-bars"></div></div>
-    <div class="sp-section" id="sp-poi-section">
+    <div class="sp-section">
       <div class="sp-title" style="display:flex;justify-content:space-between;">
         <span>Pontos de Concentração</span>
         <span id="sp-poi-total" style="color:#4dff6e;font-size:8px;letter-spacing:1px;"></span>
@@ -208,6 +208,12 @@ async function fetchPOIs(lat,lng,radius=1500){
   const endpoints=['https://overpass-api.de/api/interpreter','https://overpass.kumi.systems/api/interpreter','https://overpass.openstreetmap.fr/api/interpreter'];
   for(const ep of endpoints){try{const r=await fetch(ep,{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:'data='+encodeURIComponent(q)});if(!r.ok)continue;const d=await r.json();if(!d.elements||!d.elements.length)continue;return d.elements.filter(e=>e.lat&&e.lon).map(e=>({type:'Feature',geometry:{type:'Point',coordinates:[e.lon,e.lat]},properties:{name:e.tags?.name||'',poi_type:getPOIType(e.tags),amenity:e.tags?.amenity||e.tags?.shop||e.tags?.highway||''}}));}catch(e){continue;}}return[];
 }
+function clearPOIPanel(){
+  document.getElementById('sp-poi-list').innerHTML='<div class="poi-loading">CARREGANDO POIs...</div>';
+  document.getElementById('sp-poi-total').textContent='';
+  document.getElementById('sb-pois').textContent='0';
+  if(map&&map.getSource('poi-source'))map.getSource('poi-source').setData({type:'FeatureCollection',features:[]});
+}
 async function doLogin(){
   const email=document.getElementById('l-email').value.trim(),pass=document.getElementById('l-pass').value,btn=document.getElementById('l-btn'),err=document.getElementById('l-err');
   if(!email||!pass){err.textContent='PREENCHA EMAIL E SENHA';return;}
@@ -274,7 +280,7 @@ function updatePOIPanel(features){
   document.getElementById('sp-poi-total').textContent=total+' POIs';
   document.getElementById('sb-pois').textContent=total;
   const sorted=Object.entries(counts).filter(([,v])=>v>0).sort((a,b)=>b[1]-a[1]);
-  document.getElementById('sp-poi-list').innerHTML=sorted.map(([type,count])=>{const info=POI_TYPES[type];return`<div class="poi-row"><div class="poi-dot" style="background:${info.color}"></div><div class="poi-label">${info.label}</div><div class="poi-count">${count}</div></div>`;}).join('')||'<div class="poi-loading">Nenhum POI encontrado</div>';
+  document.getElementById('sp-poi-list').innerHTML=sorted.map(([type,count])=>{const info=POI_TYPES[type];return`<div class="poi-row"><div class="poi-dot" style="background:${info.color}"></div><div class="poi-label">${info.label}</div><div class="poi-count">${count}</div></div>`;}).join('')||'<div class="poi-loading">Nenhum POI encontrado nesta região</div>';
 }
 function updatePanel(data){
   const hojeArr=data.filter(a=>a.created_at.startsWith(hoje)),altos=data.filter(a=>a.interesse==='alto'),agentesUnicos=new Set(data.map(a=>a.agente_id)).size;
@@ -302,14 +308,39 @@ async function searchAddress(query){
   dd.innerHTML=data.features.map(f=>{const name=f.text||f.place_name.split(',')[0];const addr=f.place_name.replace(f.text+', ','');return`<div class="search-item" onclick="selectPlace(${f.center[1]},${f.center[0]},'${f.place_name.replace(/'/g,"\\'")}')"><span class="place-name">${name}</span><span class="place-addr">${addr}</span></div>`;}).join('');}catch(e){dd.innerHTML='<div class="search-loading">Erro ao buscar. Tente novamente.</div>';}
 }
 async function selectPlace(lat,lng,name){
-  closeDropdown();document.getElementById('search-input').value='';document.getElementById('search-clear').style.display='none';
-  const shortName=name.split(',')[0];document.getElementById('territory-name').textContent=shortName;document.getElementById('territory-pill').classList.add('show');
-  map.flyTo({center:[lng,lat],zoom:14,duration:1200});currentLat=lat;currentLng=lng;poisLoaded=false;
-  if(poisVisible){const btn=document.getElementById('btn-poi');btn.textContent='⊙ CARREGANDO POIs...';btn.disabled=true;const features=await fetchPOIs(lat,lng);if(map.getSource('poi-source'))map.getSource('poi-source').setData({type:'FeatureCollection',features});updatePOIPanel(features);poisLoaded=true;btn.textContent='⊗ OCULTAR POIs';btn.disabled=false;}
+  closeDropdown();
+  document.getElementById('search-input').value='';
+  document.getElementById('search-clear').style.display='none';
+  const shortName=name.split(',')[0];
+  document.getElementById('territory-name').textContent=shortName;
+  document.getElementById('territory-pill').classList.add('show');
+  map.flyTo({center:[lng,lat],zoom:14,duration:1200});
+  currentLat=lat;currentLng=lng;poisLoaded=false;
+  clearPOIPanel();
+  if(poisVisible){
+    const btn=document.getElementById('btn-poi');
+    btn.textContent='⊙ CARREGANDO POIs...';btn.disabled=true;
+    const features=await fetchPOIs(lat,lng);
+    if(map.getSource('poi-source'))map.getSource('poi-source').setData({type:'FeatureCollection',features});
+    updatePOIPanel(features);poisLoaded=true;
+    btn.textContent='⊗ OCULTAR POIs';btn.disabled=false;
+  }
 }
 function closeDropdown(){document.getElementById('search-dropdown').style.display='none';}
 function clearSearch(){document.getElementById('search-input').value='';document.getElementById('search-clear').style.display='none';closeDropdown();}
-function resetTerritory(){document.getElementById('territory-pill').classList.remove('show');currentLat=-22.9068;currentLng=-47.0626;poisLoaded=false;if(poisVisible){map.setLayoutProperty('poi-layer','visibility','none');poisVisible=false;document.getElementById('btn-poi').classList.remove('active');document.getElementById('btn-poi').textContent='⊕ PONTOS DE CONCENTRAÇÃO';document.getElementById('leg-poi').style.display='none';document.getElementById('sp-poi-list').innerHTML='<div class="poi-loading">Ative os POIs no mapa</div>';document.getElementById('sp-poi-total').textContent='';document.getElementById('sb-pois').textContent='0';}}
+function resetTerritory(){
+  document.getElementById('territory-pill').classList.remove('show');
+  currentLat=-22.9068;currentLng=-47.0626;poisLoaded=false;
+  if(poisVisible){
+    map.setLayoutProperty('poi-layer','visibility','none');poisVisible=false;
+    document.getElementById('btn-poi').classList.remove('active');
+    document.getElementById('btn-poi').textContent='⊕ PONTOS DE CONCENTRAÇÃO';
+    document.getElementById('leg-poi').style.display='none';
+    document.getElementById('sp-poi-list').innerHTML='<div class="poi-loading">Ative os POIs no mapa</div>';
+    document.getElementById('sp-poi-total').textContent='';
+    document.getElementById('sb-pois').textContent='0';
+  }
+}
 document.addEventListener('click',e=>{if(!e.target.closest('.search-wrap'))closeDropdown();});
 sb.auth.onAuthStateChange(async(event,session)=>{if(session?.user&&!user){user=session.user;showDash();}});
 </script>
