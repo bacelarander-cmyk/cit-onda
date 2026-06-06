@@ -339,9 +339,10 @@ input::placeholder{color:rgba(77,255,110,.28);font-size:11px;letter-spacing:2px;
   <div class="legend" id="leg-ibge" style="display:none;bottom:200px;">
     <div class="leg-title">DOMICÍLIOS · CONDIÇÃO DE OCUPAÇÃO</div>
     <div style="display:flex;flex-direction:column;gap:5px;margin-top:4px;">
-      <div style="display:flex;align-items:center;gap:6px;"><div style="width:9px;height:9px;border-radius:2px;background:rgba(255,107,107,.7);flex-shrink:0;"></div><span style="font-size:8px;opacity:.7;letter-spacing:.5px;">Predomin. Alugado — Lead quente</span></div>
-      <div style="display:flex;align-items:center;gap:6px;"><div style="width:9px;height:9px;border-radius:2px;background:rgba(196,160,64,.7);flex-shrink:0;"></div><span style="font-size:8px;opacity:.7;letter-spacing:.5px;">Predomin. Próprio — Upgrade/permuta</span></div>
-      <div style="display:flex;align-items:center;gap:6px;"><div style="width:9px;height:9px;border-radius:2px;background:rgba(77,255,110,.4);flex-shrink:0;"></div><span style="font-size:8px;opacity:.7;letter-spacing:.5px;">Misto / Cedido — Perfil MCMV</span></div>
+      <div style="display:flex;align-items:center;gap:6px;"><div style="width:9px;height:9px;border-radius:2px;background:rgba(255,80,80,.75);flex-shrink:0;"></div><span style="font-size:8px;opacity:.7;letter-spacing:.5px;">+20% alugado — Lead quente</span></div>
+      <div style="display:flex;align-items:center;gap:6px;"><div style="width:9px;height:9px;border-radius:2px;background:rgba(255,200,50,.65);flex-shrink:0;"></div><span style="font-size:8px;opacity:.7;letter-spacing:.5px;">10-20% alugado — Potencial</span></div>
+      <div style="display:flex;align-items:center;gap:6px;"><div style="width:9px;height:9px;border-radius:2px;background:rgba(196,160,64,.35);flex-shrink:0;"></div><span style="font-size:8px;opacity:.7;letter-spacing:.5px;">Predomin. Próprio — Upgrade/permuta</span></div>
+      <div style="display:flex;align-items:center;gap:6px;"><div style="width:9px;height:9px;border-radius:2px;background:rgba(77,255,110,.3);flex-shrink:0;"></div><span style="font-size:8px;opacity:.7;letter-spacing:.5px;">MCMV — Cedido/misto</span></div>
       <div style="display:flex;align-items:center;gap:6px;"><div style="width:9px;height:9px;border-radius:2px;background:rgba(150,150,150,.3);flex-shrink:0;"></div><span style="font-size:8px;opacity:.5;letter-spacing:.5px;">Sem dados</span></div>
     </div>
   </div>
@@ -571,14 +572,15 @@ function initMap() {
       paint: {
         'fill-color': [
           'match', ['get', 'perfil_dom'],
-          'alugado',  'rgba(255,107,107,.55)',
-          'proprio',  'rgba(196,160,64,.55)',
+          'alugado',  'rgba(255,80,80,.75)',
+          'misto',    'rgba(255,200,50,.65)',
+          'proprio',  'rgba(196,160,64,.35)',
           'mcmv',     'rgba(77,255,110,.3)',
-          'rgba(150,150,150,.2)'
+          'rgba(150,150,150,.15)'
         ],
         'fill-opacity': 0.7
       }
-    }, 'heat-layer'); // insere ABAIXO do heatmap
+    }, 'heat-layer');
     map.addLayer({
       id: 'ibge-line-layer',
       type: 'line',
@@ -589,8 +591,6 @@ function initMap() {
         'line-width': 0.5
       }
     }, 'heat-layer');
-
-    // Popup IBGE
     const ibgePopup = new mapboxgl.Popup({ closeButton: false, offset: 8 });
     map.on('click', 'ibge-fill-layer', e => {
       const p = e.features[0].properties;
@@ -605,7 +605,8 @@ function initMap() {
     map.on('mouseleave', 'ibge-fill-layer', () => { map.getCanvas().style.cursor = ''; ibgePopup.remove(); });
 
     // POI popup on click
-    const popup = new mapboxgl.Popup({ closeButton: false, offset: 12 });    map.on('click', 'poi-layer', e => {
+    const popup = new mapboxgl.Popup({ closeButton: false, offset: 12 });
+    map.on('click', 'poi-layer', e => {
       const props = e.features[0].properties;
       const typeInfo = POI_TYPES[props.poi_type] || POI_TYPES.other;
       popup.setLngLat(e.features[0].geometry.coordinates)
@@ -616,6 +617,7 @@ function initMap() {
     map.on('mouseleave', 'poi-layer', () => { map.getCanvas().style.cursor = ''; popup.remove(); });
 
     renderMap(allData);
+    map.on('moveend', () => { if (ibgeVisible) { ibgeLoaded = false; carregarIBGE(); } });
   });
 
   map.addControl(new mapboxgl.NavigationControl({ showCompass: false }), 'top-right');
@@ -624,7 +626,7 @@ function initMap() {
 // ── DATA ──
 async function loadData() {
   const { data } = await sb.from('abordagens')
-    .select('id,latitude,longitude,tipo_contato,perfil_lead,interesse,created_at,agente_id')
+    .select('id,latitude,longitude,tipo_contato,perfil_lead,interesse,created_at,agente_id,nome_lead,telefone_lead')
     .order('created_at', { ascending: false });
   allData = data || [];
   applyFilters();
@@ -766,7 +768,7 @@ function updatePanel(data) {
         <span class="fi-int" style="color:${cor}">${(a.interesse||'–').toUpperCase()}</span>
         <span class="fi-hora">${hora}</span>
       </div>
-      <div class="fi-coords">${a.latitude?.toFixed(4)}, ${a.longitude?.toFixed(4)}</div>
+      <div class="fi-coords" style="color:rgba(77,255,110,.6);font-size:8px;margin-top:2px;">${a.nome_lead||'–'}${(a.telefone_lead||'').replace(/\D/g,'').length>=10?' <a href="https://wa.me/55'+(a.telefone_lead||'').replace(/\D/g,'')+'" target="_blank" style="color:#25d366;font-size:7px;text-decoration:none;">● WA</a>':''}</div>
     </div>`;
   }).join('') || '<div style="opacity:.28;font-size:10px;text-align:center;padding:20px;letter-spacing:1px;">Nenhuma abordagem nos filtros selecionados</div>';
 }
@@ -927,17 +929,12 @@ async function toggleIBGE() {
 async function carregarIBGE() {
   const bounds = map.getBounds();
   const { data, error } = await sb.rpc('setores_no_viewport', {
-    min_lng: bounds.getWest(),
-    max_lng: bounds.getEast(),
-    min_lat: bounds.getSouth(),
-    max_lat: bounds.getNorth(),
+    min_lng: bounds.getWest(), max_lng: bounds.getEast(),
+    min_lat: bounds.getSouth(), max_lat: bounds.getNorth(),
     limite: 2000
   });
-
   if (error || !data || !data.length) {
-    // Fallback: carrega por município visível
-    const { data: setores } = await sb
-      .from('setores_censitarios')
+    const { data: setores } = await sb.from('setores_censitarios')
       .select('id,cd_setor,nm_municipio,nm_bairro,alugado,proprio,cedido,perfil_dom,geojson_geom')
       .limit(2000);
     if (setores) renderIBGE(setores);
@@ -956,26 +953,45 @@ function renderIBGE(setores) {
       type: 'Feature',
       geometry: geom,
       properties: {
-        cd_setor: s.cd_setor,
-        nm_municipio: s.nm_municipio,
-        nm_bairro: s.nm_bairro,
-        alugado: s.alugado || 0,
-        proprio: s.proprio || 0,
-        cedido: s.cedido || 0,
-        perfil_dom: s.perfil_dom || 'sem_dado'
+        cd_setor: s.cd_setor, nm_municipio: s.nm_municipio, nm_bairro: s.nm_bairro,
+        alugado: s.alugado||0, proprio: s.proprio||0, cedido: s.cedido||0,
+        perfil_dom: s.perfil_dom||'sem_dado'
       }
     };
   }).filter(Boolean);
-
   if (map.getSource('ibge-source')) {
     map.getSource('ibge-source').setData({ type: 'FeatureCollection', features });
   }
 }
 
-// Recarrega IBGE ao mover mapa
-map && map.on && map.on('moveend', () => {
-  if (ibgeVisible) { ibgeLoaded = false; carregarIBGE(); }
-});
+// ── EXPORTAR CSV ──
+function exportarCSV() {
+  const periodo = parseInt(document.getElementById('f-periodo').value);
+  const interesse = document.getElementById('f-interesse').value;
+  const tipo = document.getElementById('f-tipo').value;
+  let filtered = [...allData];
+  if (periodo > 0) { const desde = new Date(); desde.setDate(desde.getDate()-periodo); filtered = filtered.filter(a => new Date(a.created_at) >= desde); }
+  if (interesse) filtered = filtered.filter(a => a.interesse === interesse);
+  if (tipo) filtered = filtered.filter(a => a.tipo_contato === tipo);
+  if (!filtered.length) { alert('Nenhuma abordagem para exportar.'); return; }
+  const headers = ['Data','Hora','Nome Lead','Telefone','WhatsApp','Tipo Contato','Perfil Lead','Interesse','Observação','Latitude','Longitude'];
+  const rows = filtered.map(a => {
+    const dt = new Date(a.created_at);
+    const telDigits = (a.telefone_lead||'').replace(/\D/g,'');
+    const waLink = telDigits.length >= 10 ? `https://wa.me/55${telDigits}` : '';
+    return [dt.toLocaleDateString('pt-BR'), dt.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'}),
+      a.nome_lead||'', a.telefone_lead||'', waLink, a.tipo_contato||'', a.perfil_lead||'',
+      a.interesse||'', (a.observacao||'').replace(/,/g,' '), a.latitude||'', a.longitude||''
+    ].map(v => `"${v}"`).join(',');
+  });
+  const csv = [headers.join(','), ...rows].join('\n');
+  const blob = new Blob(['\uFEFF'+csv], {type:'text/csv;charset=utf-8;'});
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  const pl = {1:'hoje',7:'7dias',30:'30dias',0:'tudo'}[periodo]||'filtro';
+  link.href = url; link.download = `cit-onda-leads-${pl}-${new Date().toISOString().split('T')[0]}.csv`;
+  link.click(); URL.revokeObjectURL(url);
+}
 
 // ── SESSION RESTORE ──
 sb.auth.onAuthStateChange(async (event, session) => {
